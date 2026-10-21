@@ -1,45 +1,53 @@
-# The Midnight Museum — PYP 6 Halloween Escape Room
+# The Midnight Museum — Classroom Edition
 
-A completely static, Chromebook-friendly Halloween escape room built from the supplied PYP 6 unit slide decks and EDM Unit 2 assessment topics. Five puzzle rooms are intended for a 20-minute collaborative experience, followed by approximately 10 minutes of costume voting and a 5-minute finale, with five minutes for the introduction.
+A static, Chromebook-friendly Halloween escape room. Teams investigate five rooms, collect five digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the three website files on GitHub Pages.
 
-## Classroom schedule (40 minutes)
-- 0–5 minutes: Introduce Pip, group students, open the website.
-- 5–25 minutes: Complete five interactive rooms. Each room gives one final-code digit.
-- 25–35 minutes: Costume voting through an embedded Google Form.
-- 35–40 minutes: Announce awards and celebrate.
+## Classroom planning
 
-## Curriculum connections
-1. Clockmaker: lowest common multiple, Unit 2 assessment, numbers 9 and 12; first common multiple 36.
-2. Potion: equivalent ratio 3:2 and three-fourths of a quantity, Unit 2 assessment themes.
-3. Gallery: observation vs inference, evidence, framing/headlines, responsibility, _Perceptions and Misconceptions_ and _The Boy Who Fooled the World_.
-4. Robot: design cycle, testing, improvements and limitations of technology, _Technological Advancements_.
-5. Poet: persuasive claim for an audience supported by evidence, modal verb 'should', and a spoken-word acrostic, connected to persuasive-writing and grammar slides.
+Allow 5 minutes to introduce Pip and form teams, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for about 3 minutes per room, allowing time for discussion and the final code. The countdown begins when a team enters the museum and continues through the final door. Pause is available; reaching zero permits teams to continue solving.
 
-## Teacher answer key
-- Clock: 36 minutes → 6.
-- Potion: 8 purple drops and 9 jars → 9.
-- Gallery: factual observation option B and careful headline option B → 2.
-- Robot: improve after testing (B), add/test a low-light sensor (C) → 4.
-- Poem: persuasive claim B and hidden word CHECK → 5.
-- **Final code: 69245**.
+Each room begins with clickable objects that reveal clues in a notebook. Inspect every object to reveal the lock challenge. Potion jars can be toggled to model three-fourths of 12; the team still enters its own numerical answer. Hints and retry feedback support discussion. The robot and gallery use evidence-based decisions, while the poem combines persuasion with an acrostic.
 
-This teacher key is also in the bottom collapsible section of the webpage; do not display that section to students. Source-code inspection can reveal answers because no backend is used.
+Progress, clue discoveries, answers and the timer are saved in this browser's local storage when available. The countdown continues while the tab is closed unless paused. Refresh, select Continue, and pick up where you left off. Use **Start a new team game** between teams; restarting an existing game asks for confirmation. Storage restrictions may prevent recovery, but the game still works. Teams should use one device each. No student names or answers are sent to a server by the escape game.
 
-## GitHub Pages deployment
-1. Create a GitHub repository.
-2. Upload `index.html` to the repository root.
-3. Go to Settings → Pages, select Deploy from a branch, main, /(root), and Save.
-4. Open the Pages URL once deployed. The game has no installation or server requirements.
+## Curriculum connections and teacher answer key
 
-## Google Forms + Sheets voting
-1. Create a Google Form with four questions: funniest, scariest, most creative, best homemade.
-2. Enter student costume labels or nominee numbers (avoid public student names).
-3. In Forms → Responses, link a spreadsheet in Google Sheets.
-4. Publish/share the responder link ending in `/viewform` (rather than the editor link).
-5. In `index.html` replace `const GOOGLE_FORM_URL='';` with the responder URL inside quotes.
-6. Test the form on a student Chromebook. If your school restricts embedded content, use the provided new-tab link.
+The supplied starting website identifies PYP 6 slide decks and EDM Unit 2 topics as its basis. Those six source resources were not present in this checkout, so these connections describe the supplied material and have not been independently checked against those resources. Questions are original classroom puzzles.
 
-For one student per vote on a shared Chromebook, **do not enable 'Limit to 1 response'** unless everyone has their own sign-in context. Google Forms alone does not reliably prevent repeat votes without account restrictions. Review school consent/privacy settings before collecting identifying details.
+| Room | Concepts and reasoning | Answer | Digit |
+| --- | --- | --- | --- |
+| Clockmaker’s Secret | LCM of 9 and 12; compare multiples | First shared multiple is 36 minutes; take its ones digit | 6 |
+| Potion of Proportions | Equivalent ratios and a fraction of a quantity | 3:2 scaled by 4 gives 12:8; three-fourths of 12 is 9 jars | 9 |
+| Gallery of Misleading Headlines | Observation versus inference; framing and responsible reporting; Perceptions and Misconceptions / The Boy Who Fooled the World | Observation B: painting on floor at 21:06. Headline B: cause unknown. B is alphabet position 2 | 2 |
+| Rescue Robot That Failed | Design cycle, test evidence and technology limitations; Technological Advancements | B: improve and test again. C: add a low-light sensor and test in darkness. Improve is stage 4 of this puzzle’s checklist | 4 |
+| Poet Behind the Portrait | Persuasive claim, audience, evidence, modal verb “should”, spoken-word poetry | Claim B supports a recommendation with evidence. First letters spell CHECK, five letters | 5 |
 
-## Editable game content
-All game content lives in the `rooms` array in `index.html`; edit questions, hints and feedback there. This version was written as new, original questions tied to concepts in the slides rather than copying published assessment questions verbatim. No student data is stored by the escape game.
+**Final rescue code: 69245.** Teacher answers are kept off the student interface. This is a static educational activity; source inspection can still reveal answers.
+
+## GitHub Pages
+
+Repository: https://github.com/AVTpepper/mis-halloween
+
+1. In repository **Settings → Pages → Build and deployment**, select **GitHub Actions** as the source (an administrator may need to enable Pages).
+2. Push to `main`, or run **Deploy classroom website** manually in the Actions tab.
+3. Check the workflow’s deployment link. The expected URL is `https://avtpepper.github.io/mis-halloween/`.
+
+The workflow publishes only `index.html`, `styles.css` and `game.js`. All asset paths are relative so the repository subpath works. Alternatively, select **Deploy from a branch → main → /(root)**; the same three files work directly without a build. Use one deployment method.
+
+## Google Forms costume voting
+
+1. Create a Google Form for funniest, scariest, most creative and best homemade costume.
+2. Prefer costume labels or nominee numbers rather than public student names.
+3. Link responses to Google Sheets using the Form’s Responses tab.
+4. In `game.js`, set `const GOOGLE_FORM_URL='';` to your published HTTPS responder URL ending in `/viewform`. Do not use the editor URL.
+5. Push the change and test on a school Chromebook. A full `docs.google.com/forms/.../viewform` URL is embedded, with a new-tab fallback. A `forms.gle` short link opens in a new tab.
+
+Until a form is supplied, students see a friendly waiting message. Voting is hosted separately by Google and follows its account and school access settings. Avoid “Limit to 1 response” on shared devices unless students have separate sign-in contexts. Google Forms cannot reliably prevent duplicate votes without account restrictions.
+
+## Editing, verification and ZIP
+
+`game.js` contains puzzle content (`rooms`), inspectable clues (`objects`), game flow and the form setting. Edit appearance in `styles.css` and page structure in `index.html`.
+
+For browser checks, install Node.js and Microsoft Edge, then run `npm ci` followed by `npm test`. Playwright launches Edge against a local static server and covers the complete rescue, mistakes, refresh recovery, jar model, pause, timeout, restart, mobile overflow and form embedding. Development dependencies are unnecessary for classroom use.
+
+On Windows, run `powershell -File scripts/package.ps1` to create `artifacts/midnight-museum-classroom.zip`. It contains the three website files plus this teacher guide. Extract all files together and open `index.html`. The generated ZIP is ignored by Git; source files and the packaging script are tracked.
