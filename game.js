@@ -19,6 +19,7 @@ const objects = [
   [['🕹️','Inspect arcade cabinet','Player 1 clears 10 levels, then Player 2 clears 10. Collect one gold spark per level. Both turns are required.'],['🛡️','Read safety plaque','The team shares five lives across every room. Incorrect answers, wrong rescue codes and snake crashes each cost one life. Lose all five and the entire rescue restarts.'],['🔧','Pull out service card','Both circuits are powered. Clear ten levels for Player 1, then pass the keyboard to Player 2 for another ten levels.']]
 ];
 let index = 0, code = [], remaining = 1200, running = false, timer = null;
+let activeClue=null;
 let selected = {}, inspected = [], answers = {}, jars = [], started = false, won = false, deadline = 0;
 function val(id) { return (el(id)?.value || '').trim(); }
 function save() {
@@ -50,7 +51,7 @@ function resumeGame() {
   render(); show('game');
 }
 function startGame(withIntro=true) {
-  Exploration.reset(); Snake.reset(); lives=TEAM_LIVES; clearInterval(timer); index=0; code=[]; remaining=1200; selected={}; inspected=[]; answers={}; jars=[]; started=true; won=false; running=true; deadline=Date.now()+remaining*1000;
+  activeClue=null; Exploration.reset(); Snake.reset(); lives=TEAM_LIVES; clearInterval(timer); index=0; code=[]; remaining=1200; selected={}; inspected=[]; answers={}; jars=[]; started=true; won=false; running=true; deadline=Date.now()+remaining*1000;
   el('finalCode').value=''; el('finalFeedback').textContent='';
   el('enterBtn').textContent='Continue your rescue →';
   timer=setInterval(tick,1000); render(); show('game'); save();
@@ -106,13 +107,15 @@ function renderObjects() {
 }
 function inspectObject(i) {
   if(!Exploration.canInspect(index,i))return;
+  activeClue=i;
   const newlyFound=!inspected.includes(i);
   if(!inspected.includes(i)) inspected.push(i);
   renderObjects(); save();
   const object=el('exploration').querySelectorAll('.object')[i];
   if(newlyFound)object.classList.add('clue-new');
-  object.focus();
-  Snake.pause();Cutscene.investigate(index,i);
+  object.focus({preventScroll:true});
+  Snake.pause();
+  el('objectClue').scrollIntoView({block:'nearest',behavior:'instant'});
 }
 function paintJar(button,i) { button.classList.toggle('filled',jars.includes(i)); button.setAttribute('aria-pressed',String(jars.includes(i))); }
 function updateJars() { el('jarCount').textContent=`${jars.length} of 12 jars filled. Model three-fourths, then enter your answer.`; }
@@ -154,7 +157,7 @@ function checkAnswer() {
   const r=rooms[index];
   if(!r.validate()) {loseLife('The lock stays closed. Revisit the clues and discuss your answers.');return;}
   playLockEffect(true);
-  code.push(r.digit);index++;selected={};inspected=[];answers={};jars=[];
+  code.push(r.digit);index++;activeClue=null;selected={};inspected=[];answers={};jars=[];
   if(index===rooms.length) {renderFinal();show('final');}
   else {render();show('game');el('feedback').textContent='✓ Lock opened! '+r.reveal;}
   save();
