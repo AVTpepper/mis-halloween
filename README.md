@@ -20,6 +20,10 @@ Use arrow keys, WASD, or the on-screen direction buttons. Start/resume the turn 
 
 ## Curriculum connections and teacher answer key
 
+Open **Teacher room** in the top navigation and enter `halloween123` to view classroom planning, the learning focus, explanation, answer, digit and discussion prompt for every stage, the final code and setup notes. Opening the room pauses an active countdown. Return to the game and press Resume to continue. Leaving the room or refreshing locks it again; the access code is not saved in browser storage. Incorrect teacher-code attempts do not cost team lives.
+
+This is a convenience gate on a static site, not secure authentication: the code and answers remain discoverable in the downloaded source. Avoid displaying the unlocked room to students.
+
 The supplied starting website identifies PYP 6 slide decks and EDM Unit 2 topics as its basis. Those six source resources were not present in this checkout, so these connections describe the supplied material and have not been independently checked against those resources. Questions are original classroom puzzles.
 
 | Room | Concepts and reasoning | Answer | Digit |
