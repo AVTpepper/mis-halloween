@@ -12,23 +12,23 @@ const TEAM_LIVES = 5;
 let lives = TEAM_LIVES;
 const objects = [
   [['🕰️','Inspect brass clock','The brass clock chimes every 9 minutes. Both clocks chimed at midnight.'],['🕛','Inspect silver clock','The silver clock chimes every 12 minutes. Find their first shared chime after midnight.'],['📓','Open clockmaker’s notebook','List multiples of each interval. The first shared multiple gives the minutes; its ones digit opens the lock.']],
-  [['⚗️','Read the recipe','Keep orange : purple at 3 : 2. Today the machine uses 12 orange drops.'],['📦','Open jar cupboard','There are 12 jars. Fill three out of every four. You can tap the jars below to model the fraction.']],
-  [['📸','Examine camera record','21:05: Pip stands beside the gallery door. 21:06: a painting lies on the floor. No recording shows anyone touching it.'],['📰','Inspect the newspaper','“EVIL GHOST DESTROYS PRICELESS ART!” The editor has claimed a cause that the camera does not show. Discuss what is observed and what is assumed.']],
-  [['🤖','Read robot test log','Daylight: reaches the painting in 3 of 3 tests. Darkness: reaches it in 0 of 3 tests. Its camera cannot navigate in low light.'],['🧰','Open inventor’s toolkit','A low-light sensor may help the robot see in darkness. A shiny logo changes its appearance. Every proposed improvement needs another test.']],
-  [['✉️','Read director’s letter','“Give me a clear recommendation and evidence. Tell me what the museum should do and why.”'],['🎭','Turn over the portrait','Pip’s poem hides a message in the first letter of each line. Read it aloud together, then read down its left edge.']],
-  [['🕹️','Inspect arcade cabinet','Player 1 clears 10 levels, then Player 2 clears 10. Collect one gold spark per level. Both turns are required.'],['🛡️','Read safety plaque','The team shares five lives across every room. Incorrect answers, wrong rescue codes and snake crashes each cost one life. Lose all five and the entire rescue restarts.']]
+  [['⚗️','Read the recipe','Keep orange : purple at 3 : 2. Today the machine uses 12 orange drops.'],['📦','Open jar cupboard','There are 12 jars. Fill three out of every four. You can tap the jars below to model the fraction.'],['🔎','Inspect glass etchings','Three orange drops and two purple drops are etched into the glass. Rebuild this sample to release the hidden recipe scroll.']],
+  [['📸','Examine camera record','21:05: Pip stands beside the gallery door. 21:06: a painting lies on the floor. No recording shows anyone touching it.'],['📰','Inspect the newspaper','“EVIL GHOST DESTROYS PRICELESS ART!” The editor has claimed a cause that the camera does not show. Discuss what is observed and what is assumed.'],['🔎','Search behind the frame','A folded editor’s note reads: report only what you can support. The missing camera moment leaves the cause unknown.']],
+  [['🤖','Read robot test log','Daylight: reaches the painting in 3 of 3 tests. Darkness: reaches it in 0 of 3 tests. Its camera cannot navigate in low light.'],['🧰','Open inventor’s toolkit','A low-light sensor may help the robot see in darkness. A shiny logo changes its appearance. Every proposed improvement needs another test.'],['📋','Read maintenance note','A replacement sensor must be tested under the same dark conditions that caused the original failure. Improve, then test again.']],
+  [['✉️','Read director’s letter','“Give me a clear recommendation and evidence. Tell me what the museum should do and why.”'],['🎭','Turn over the portrait','Pip’s poem hides a message in the first letter of each line. Read it aloud together, then read down its left edge.'],['📜','Unfold the hidden page','The restored strips form one poem. Follow its left margin from top to bottom to find Pip’s message.']],
+  [['🕹️','Inspect arcade cabinet','Player 1 clears 10 levels, then Player 2 clears 10. Collect one gold spark per level. Both turns are required.'],['🛡️','Read safety plaque','The team shares five lives across every room. Incorrect answers, wrong rescue codes and snake crashes each cost one life. Lose all five and the entire rescue restarts.'],['🔧','Pull out service card','Both circuits are powered. Clear ten levels for Player 1, then pass the keyboard to Player 2 for another ten levels.']]
 ];
 let index = 0, code = [], remaining = 1200, running = false, timer = null;
 let selected = {}, inspected = [], answers = {}, jars = [], started = false, won = false, deadline = 0;
 function val(id) { return (el(id)?.value || '').trim(); }
 function save() {
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify({index,code,remaining,running,selected,inspected,answers,jars,started,won,deadline,lives,arcade:Snake.snapshot()})); } catch {}
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({index,code,remaining,running,selected,inspected,answers,jars,started,won,deadline,lives,arcade:Snake.snapshot(),exploration:Exploration.snapshot()})); } catch {}
 }
 function restore() {
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY));
     if (!s || !Number.isInteger(s.lives) || s.lives<1 || s.lives>TEAM_LIVES || !s.started || !Number.isInteger(s.index) || s.index < 0 || s.index > rooms.length || !Array.isArray(s.code) || s.code.join('') !== rooms.slice(0,s.index).map(r=>r.digit).join('') || s.code.length !== s.index || !Number.isFinite(s.remaining) || s.remaining < 0 || s.remaining > 1200) return;
-    lives=s.lives; Snake.restore(s.arcade);
+    lives=s.lives; Snake.restore(s.arcade); Exploration.restore(s.exploration);
     index=s.index; code=s.code; remaining=s.remaining; selected=s.selected || {}; inspected=Array.isArray(s.inspected)?s.inspected:[]; answers=s.answers || {}; jars=Array.isArray(s.jars)?s.jars:[]; started=true; won=!!s.won && index===rooms.length;
     running=!!s.running && !won; deadline=Number.isFinite(s.deadline)?s.deadline:Date.now()+remaining*1000;
     if(running) remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));
@@ -50,7 +50,7 @@ function resumeGame() {
   render(); show('game');
 }
 function startGame(withIntro=true) {
-  Snake.reset(); lives=TEAM_LIVES; clearInterval(timer); index=0; code=[]; remaining=1200; selected={}; inspected=[]; answers={}; jars=[]; started=true; won=false; running=true; deadline=Date.now()+remaining*1000;
+  Exploration.reset(); Snake.reset(); lives=TEAM_LIVES; clearInterval(timer); index=0; code=[]; remaining=1200; selected={}; inspected=[]; answers={}; jars=[]; started=true; won=false; running=true; deadline=Date.now()+remaining*1000;
   el('finalCode').value=''; el('finalFeedback').textContent='';
   el('enterBtn').textContent='Continue your rescue →';
   timer=setInterval(tick,1000); render(); show('game'); save();
@@ -99,12 +99,13 @@ function render() {
   renderObjects(); updateClock();
 }
 function renderObjects() {
-  el('exploration').innerHTML='<p class="tag">Investigate the room</p><p>Inspect each object to collect your clues. Then try the lock below.</p><div class="objects">'+objects[index].map((o,i)=>`<button class="object ${inspected.includes(i)?'found':''}" aria-expanded="${inspected.includes(i)}" onclick="inspectObject(${i})"><span aria-hidden="true">${o[0]}</span>${o[1]}<small>${inspected.includes(i)?'Clue collected ✓':'Tap to examine'}</small></button>`).join('')+'</div><div class="cluebook" aria-live="polite">'+objects[index].filter((o,i)=>inspected.includes(i)).map(o=>`<p><b>${o[1]}:</b> ${o[2]}</p>`).join('')+'</div>';
-  const ready=objects[index].every((o,i)=>inspected.includes(i));
+  el('exploration').innerHTML=Exploration.render(index);
+  const ready=Exploration.complete(index)&&objects[index].every((o,i)=>inspected.includes(i));
   el('challenge').classList.toggle('hidden',!ready); el('checkBtn').disabled=!ready;
   if(index===5 && ready) Snake.mount();
 }
 function inspectObject(i) {
+  if(!Exploration.canInspect(index,i))return;
   const newlyFound=!inspected.includes(i);
   if(!inspected.includes(i)) inspected.push(i);
   renderObjects(); save();
@@ -147,6 +148,7 @@ function playLockEffect(success,roomIndex=index,finalRescue=false) {
   lockEffectTimer=setTimeout(()=>effect.remove(),success?1550:950);
 }
 function checkAnswer() {
+  if(!Exploration.complete(index))return;
   if(index===5 && !Snake.complete())return;
   if(!objects[index].every((o,i)=>inspected.includes(i))) return;
   const r=rooms[index];
@@ -218,7 +220,7 @@ function unlockTeacherRoom(event) {
   el('teacherCode').removeAttribute('aria-invalid');el('teacherCode').value='';
   el('teacherGate').classList.add('hidden');
   el('teacherInfo').innerHTML=`<div class="card"><h2>Plan the rescue</h2><p>Allow 5 minutes to introduce Pip, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for 2–3 minutes per curriculum room and reserve 4–5 minutes for the arcade and final code. Teams use one device; two teammates take the Snake turns.</p><p>The countdown pauses when you open this room. Return to the escape room and press Resume when ready. At zero time, teams may keep solving.</p><p><b>Five shared lives:</b> an incorrect puzzle submission, incorrect final code or Snake crash costs one life. Hints and inspecting objects are free. Losing the last life automatically resets all answers, digits, arcade progress and the timer, and restores five lives.</p><p>Progress is saved in the current browser when storage is available. Use Start a new team game between groups. Refresh restores progress but never starts the snake automatically.</p></div>
-    <div class="teacher-stages">${rooms.map((room,i)=>`<article class="card"><div class="tag">Stage ${i+1} · digit ${room.digit}</div><h2>${room.scene} ${room.title}</h2><p><b>Learning focus:</b> ${teacherStages[i].goal}</p><p><b>Answer and reasoning:</b> ${teacherStages[i].answer}</p><p><b>Discuss with students:</b> ${teacherStages[i].discussion}</p><p><b>Available hint:</b> ${room.hint}</p></article>`).join('')}</div>
+    <div class="teacher-stages">${rooms.map((room,i)=>`<article class="card"><div class="tag">Stage ${i+1} · digit ${room.digit}</div><h2>${room.scene} ${room.title}</h2><p><b>Learning focus:</b> ${teacherStages[i].goal}</p><p><b>Scene walkthrough:</b> ${Exploration.guide(i)}</p><p><b>Answer and reasoning:</b> ${teacherStages[i].answer}</p><p><b>Discuss with students:</b> ${teacherStages[i].discussion}</p><p><b>Available hint:</b> ${room.hint}</p></article>`).join('')}</div>
     <div class="card"><h2>The final painting</h2><p>Assemble the six digits in room order: <strong class="teacher-rescue-code">${rooms.map(room=>room.digit).join('')}</strong>. A wrong rescue code costs one life. A correct code releases Pip and starts the celebration.</p><h3>Costume awards setup</h3><p>Create a Google Form for funniest, scariest, most creative and best homemade costume; link its responses to Google Sheets. In game.js, set GOOGLE_FORM_URL to the published HTTPS responder link ending in /viewform. A forms.gle short link opens in a new tab. Use costume labels or nominee numbers and check school access settings on a student device.</p><h3>Curriculum and deployment notes</h3><p>The supplied curriculum links are PYP 6 maths, perception and responsibility, technology limitations, persuasion and poetry. The original six teaching resources were not included in this checkout, so their alignment has not been independently verified. The questions are original.</p><p>This static site works offline and on GitHub Pages. The README includes deployment, editing, voting and ZIP instructions. This code gate keeps teacher information out of the normal student view; it is not secure authentication, and source inspection can reveal answers.</p></div>
     <button class="secondary" onclick="openTeacherRoom()">Lock teacher room</button>`;
   el('teacherInfo').classList.remove('hidden');el('teacherInfo').focus();
