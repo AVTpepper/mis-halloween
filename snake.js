@@ -14,7 +14,7 @@ const Snake = (() => {
     state.food=free[Math.floor(Math.random()*free.length)];
   }
   function complete() {return state.cleared.every(n=>n===TARGET);}
-  function pause() {clearTimeout(loop);loop=null;if(document.getElementById('snakeToggle'))document.getElementById('snakeToggle').textContent='Start / resume turn';}
+  function pause() {if(loop)message('Turn paused. Your snake is safe until you resume.');clearTimeout(loop);loop=null;if(document.getElementById('snakeToggle'))document.getElementById('snakeToggle').textContent='Start / resume turn';}
   function restore(s) {
     reset();
     const point=p=>p&&Number.isInteger(p.x)&&Number.isInteger(p.y)&&p.x>=0&&p.y>=0&&p.x<SIZE&&p.y<SIZE;

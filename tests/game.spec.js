@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+const {playTurn}=require('./snake-helper');
 async function inspect(page) {
   const count=await page.locator('.object').count();
   for(let i=0;i<count;i++) await page.locator('.object').nth(i).click();
@@ -7,6 +8,8 @@ async function choice(page,group,letter) {
   await page.locator(`[data-group="${group}"] button`).filter({hasText:new RegExp(`^${letter} ·`)}).click();
 }
 test('team explores every room, recovers progress, and rescues Pip',async({page})=>{
+  test.setTimeout(90000);
+  await page.clock.install();await page.clock.pauseAt(new Date());
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');
   await page.getByRole('button',{name:'Escape room',exact:true}).click();
@@ -24,15 +27,63 @@ test('team explores every room, recovers progress, and rescues Pip',async({page}
   await inspect(page);await choice(page,'fact','B');await choice(page,'headline','B');await page.locator('#checkBtn').click();
   await inspect(page);await choice(page,'step','B');await choice(page,'upgrade','C');await page.locator('#checkBtn').click();
   await inspect(page);await choice(page,'claim','B');await page.locator('#value5').fill('check');await page.locator('#checkBtn').click();
+  await expect(page.locator('#title')).toHaveText('The Serpent Arcade');
+  await inspect(page);await expect(page.locator('#checkBtn')).toBeDisabled();
+  await page.setViewportSize({width:375,height:812});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:'artifacts/arcade-mobile.png',fullPage:true});
+  await page.locator('#snakeToggle').click();
+  await page.getByRole('button',{name:'Steer up',exact:true}).click();await page.clock.runFor(320);
+  expect(await page.evaluate(()=>Snake.snapshot().body[0])).toEqual({x:3,y:4});
+  await page.locator('#pauseBtn').click();
+  const paused=await page.evaluate(()=>Snake.snapshot());
+  await page.clock.runFor(2000);expect(await page.evaluate(()=>Snake.snapshot())).toEqual(paused);
+  await page.locator('#pauseBtn').click();
+  await page.setViewportSize({width:1280,height:960});
+  await page.screenshot({path:'artifacts/arcade-desktop.png',fullPage:true});
+  await playTurn(page);await expect(page.locator('#playerOne')).toContainText('10 / 10');
+  await expect(page.locator('#checkBtn')).toBeDisabled();
+  await page.reload();await page.locator('#enterBtn').click();
+  await expect(page.locator('#playerOne')).toContainText('10 / 10');
+  await page.locator('#snakeToggle').click();await page.clock.runFor(2400);
+  await expect(page.locator('#snakeMessage')).toContainText('crashed');
+  await expect(page.locator('#lives')).toHaveText('3 / 5 lives');
+  await expect(page.locator('#playerOne')).toContainText('10 / 10');
+  await expect(page.locator('#playerTwo')).toContainText('0 / 10');
+  await playTurn(page);await expect(page.locator('#playerTwo')).toContainText('10 / 10');
+  await page.locator('#checkBtn').click();
   await expect(page.locator('#final')).toBeVisible();
   await page.getByRole('button',{name:'Home',exact:true}).click();await page.getByRole('button',{name:'Escape room',exact:true}).click();
   await expect(page.locator('#final')).toBeVisible();
   await page.locator('#finalCode').fill('11111');await page.getByRole('button',{name:'Unlock the painting'}).click();
   await expect(page.locator('#finalFeedback')).toContainText('remains shut');
-  await page.locator('#finalCode').fill('69245');await page.locator('#finalCode').press('Enter');
+  await expect(page.locator('#lives')).toHaveText('2 / 5 lives');
+  await page.locator('#finalCode').fill('692457');await page.locator('#finalCode').press('Enter');
   await expect(page.locator('#win')).toBeVisible();
   await page.reload();await page.locator('#enterBtn').click();await expect(page.locator('#win')).toBeVisible();
   expect(errors).toEqual([]);
+});
+test('last team life resets all earned progress and persists the fresh game',async({page})=>{
+  await page.goto('/');await page.locator('#enterBtn').click();
+  await inspect(page);await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();
+  await inspect(page);
+  await page.locator('#value2a').fill('1');await page.locator('#value2b').fill('1');
+  for(let remaining=4;remaining>=1;remaining--) {
+    await page.locator('#checkBtn').click();await expect(page.locator('#lives')).toHaveText(`${remaining} / 5 lives`);
+  }
+  await page.reload();await page.locator('#enterBtn').click();
+  await expect(page.locator('#lives')).toHaveText('1 / 5 lives');
+  await expect(page.locator('#codeSoFar')).toHaveText('6');
+  await page.locator('#checkBtn').click();
+  await expect(page.locator('#title')).toContainText('Clockmaker');
+  await expect(page.locator('#lives')).toHaveText('5 / 5 lives');
+  await expect(page.locator('#codeSoFar')).toHaveText('None yet');
+  await expect(page.locator('#feedback')).toContainText('whole rescue has restarted');
+  await expect(page.locator('#checkBtn')).toBeDisabled();
+  expect(await page.evaluate(()=>Snake.snapshot().cleared)).toEqual([0,0]);
+  await page.reload();await page.locator('#enterBtn').click();
+  await expect(page.locator('#title')).toContainText('Clockmaker');
+  await expect(page.locator('#lives')).toHaveText('5 / 5 lives');
 });
 test('pause, refresh, timeout, restart and mobile layout',async({page})=>{
   await page.setViewportSize({width:375,height:812});await page.clock.install();await page.goto('/');
