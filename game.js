@@ -111,6 +111,7 @@ function inspectObject(i) {
   const object=el('exploration').querySelectorAll('.object')[i];
   if(newlyFound)object.classList.add('clue-new');
   object.focus();
+  Snake.pause();Cutscene.investigate(index,i);
 }
 function paintJar(button,i) { button.classList.toggle('filled',jars.includes(i)); button.setAttribute('aria-pressed',String(jars.includes(i))); }
 function updateJars() { el('jarCount').textContent=`${jars.length} of 12 jars filled. Model three-fourths, then enter your answer.`; }
