@@ -9,7 +9,7 @@ const ffmpeg=require('ffmpeg-static');
   const browser=await chromium.launch({channel:'msedge'});
   try{
     const page=await browser.newPage();await page.goto(process.argv[2]||'http://127.0.0.1:4173');
-    await page.evaluate(()=>{index=5;code=rooms.slice(0,5).map(r=>r.digit);started=true;running=true;deadline=Date.now()+1200000;inspected=[0,1];render();show('game');});
+    await page.evaluate(()=>{index=5;code=rooms.slice(0,5).map(r=>r.digit);started=true;running=true;deadline=Date.now()+1200000;inspected=[0,1,2];render();Exploration.power(0);Exploration.power(1);show('game');});
     await page.evaluate(()=>{
       const chunks=[],stream=document.getElementById('snakeCanvas').captureStream(24);
       const recorder=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp8'});

@@ -1,6 +1,6 @@
 # The Midnight Museum — Classroom Edition
 
-A static, Chromebook-friendly Halloween escape room. Teams investigate six rooms, collect six digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the five website files and the `assets` directory on GitHub Pages.
+A static, Chromebook-friendly Halloween escape room. Teams investigate six rooms, collect six digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the six website files and the `assets` directory on GitHub Pages.
 
 Skippable five-second cutscenes introduce the museum, connect each solved room to the next, reveal recovered digits, and celebrate Pip’s rescue. Animated doors, glowing relics, floating Pip, stars and mist set the scene. Press Continue or Escape to skip; the team countdown pauses during the scene and resumes automatically afterward. Reduced-motion preferences disable movement. Refreshing during a scene restores the saved game paused; press Resume to continue.
 
@@ -12,7 +12,22 @@ Clips, poster images, and full source/author/licence/change credits live in `ass
 
 Allow 5 minutes to introduce Pip and form teams, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for 2–3 minutes per curriculum room and reserve roughly 4–5 minutes for the two arcade turns and final code. Timing depends on players’ Snake experience; use Pause when introducing the controls. The countdown begins when a team enters the museum and continues through the final door. Pause is available; reaching zero permits teams to continue solving.
 
-Each room begins with clickable objects that reveal clues in a notebook. Inspect every object to reveal the lock challenge. Potion jars can be toggled to model three-fourths of 12; the team still enters its own numerical answer. Hints and retry feedback support discussion. The robot and gallery use evidence-based decisions, while the poem combines persuasion with an acrostic.
+Each room is an illustrated scene with keyboard/touch-accessible objects, a sealed compartment and a mechanism to investigate. Working the mechanism reveals a hidden note. Collect all three clues and complete the mechanism to reveal the lock challenge. Clicking a discovered object replays its footage; clues also remain in the notebook. Potion jars can then be toggled to model three-fourths of 12; the team still enters its own numerical answer. Hints and retry feedback support discussion.
+
+## Exploring the rooms
+
+Experiments are free to retry; only incorrect lock submissions, wrong final codes and Snake crashes cost team lives. A discovered compartment stays open so teams can continue experimenting without losing a clue. Mechanism settings and discoveries are saved with team progress. Losing all lives or starting a new team clears every mechanism as well as the answers and digits.
+
+| Scene | What students manipulate | What it reveals |
+| --- | --- | --- |
+| Clockmaker’s workshop | Advance the clock slider from midnight; look for both chime indicators to light at 36 minutes | The desk drawer opens, revealing the clockmaker’s notebook |
+| Potion laboratory | Rebuild the etched sample using three orange drops and two purple drops; empty and retry freely | A hidden recipe scroll appears; the cupboard and glass etchings provide the other clues |
+| Evidence gallery | Sort three evidence cards into observation, assumption, observation | A folded editor’s note behind the frame |
+| Inventor’s workshop | Test the original camera in darkness, then fit a low-light sensor and test again in darkness | The failed-test log and a maintenance note; the toolkit can be examined immediately |
+| Poet’s study | Move five torn strips into their Roman-numeral stamp order I–V | The restored page behind the portrait, ready for reading its first letters |
+| Serpent arcade | Activate both player power switches | The cabinet and service card, followed by the two-player, ten-level Snake challenge |
+
+Current saves keep previously earned room digits. A room that was in progress before the exploratory update starts with its new mechanism unsolved while retaining collected clues. All six walkthroughs are also inside the code-gated Teacher room.
 
 Progress, clue discoveries, answers and the timer are saved in this browser's local storage when available. The countdown continues while the tab is closed unless paused. Refresh, select Continue, and pick up where you left off. Use **Start a new team game** between teams; restarting an existing game asks for confirmation. Storage restrictions may prevent recovery, but the game still works. Teams should use one device each. No student names or answers are sent to a server by the escape game.
 
@@ -51,7 +66,7 @@ Repository: https://github.com/AVTpepper/mis-halloween
 2. Push to `main`, or run **Deploy classroom website** manually in the Actions tab.
 3. Check the workflow’s deployment link. The expected URL is `https://avtpepper.github.io/mis-halloween/`.
 
-The workflow publishes `index.html`, `styles.css`, `game.js`, `snake.js`, `cutscenes.js` and the `assets` directory. All asset paths are relative so the repository subpath works. Alternatively, select **Deploy from a branch → main → /(root)**; the same files and assets work directly without a build. Use one deployment method.
+The workflow publishes `index.html`, `styles.css`, `game.js`, `snake.js`, `cutscenes.js`, `exploration.js` and the `assets` directory. All asset paths are relative so the repository subpath works. Alternatively, select **Deploy from a branch → main → /(root)**; the same files and assets work directly without a build. Use one deployment method.
 
 ## Google Forms costume voting
 
@@ -65,10 +80,10 @@ Until a form is supplied, students see a friendly waiting message. Voting is hos
 
 ## Editing, verification and ZIP
 
-`game.js` contains puzzle content (`rooms`), inspectable clues (`objects`), game flow and the form setting. `snake.js` contains the arcade rules, controls, drawing and saved board. Edit appearance in `styles.css` and page structure in `index.html`.
+`game.js` contains puzzle content (`rooms`), inspectable clues (`objects`), game flow and the form setting. `exploration.js` contains illustrated props, room mechanisms, hidden-compartment rules and saved scene state. `snake.js` contains the arcade rules, controls, drawing and saved board. Edit appearance in `styles.css` and page structure in `index.html`.
 
 For browser checks, install Node.js and Microsoft Edge, then run `npm ci` followed by `npm test`. Playwright launches Edge against a local static server and covers the complete six-room rescue, both 10-level Snake turns through actual controls, a crash and retained teammate progress, life loss at puzzle and final locks, zero-life reset, refresh recovery, jar model, pause, timeout, restart, mobile overflow and form embedding. Development dependencies are unnecessary for classroom use.
 
-On Windows, run `powershell -File scripts/package.ps1` to create `artifacts/midnight-museum-classroom.zip`. It contains the five website files, the complete assets directory and this teacher guide. Extract all files together and open `index.html`. The generated ZIP is ignored by Git; source files and the packaging script are tracked.
+On Windows, run `powershell -File scripts/package.ps1` to create `artifacts/midnight-museum-classroom.zip`. It contains the six website files, the complete assets directory and this teacher guide. Extract all files together and open `index.html`. The generated ZIP is ignored by Git; source files and the packaging script are tracked.
 
 The checked-in MP4s require no video tooling for playback or deployment. To regenerate the stock clips, run `node scripts/prepare-videos.cjs` then `node scripts/video-credits.cjs` after `npm ci`; FFmpeg is a development dependency. To regenerate the arcade recording, start `node tests/server.cjs` in another terminal, then run `node scripts/record-arcade.cjs`. The capture uses the actual Snake canvas and keyboard controls. Original downloaded media stays under ignored `artifacts/source-videos/`.

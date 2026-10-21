@@ -1,4 +1,5 @@
 const {skipCutscene}=require('./cutscene-helper');
+const {investigateRoom}=require('./exploration-helper');
 const {test,expect}=require('@playwright/test');
 test('cutscenes pause time, skip with Escape, and advance automatically',async({page})=>{
   await page.clock.install({time:new Date('2026-10-21T12:00:00Z')});await page.clock.pauseAt(new Date('2026-10-21T12:00:01Z'));await page.goto('/');
@@ -9,7 +10,7 @@ test('cutscenes pause time, skip with Escape, and advance automatically',async({
   await page.clock.runFor(4000);await expect(page.locator('#clock')).toHaveText('20:00');
   await page.keyboard.press('Escape');await expect(page.locator('#cutscene')).not.toBeVisible();
   await page.clock.runFor(1000);await expect(page.locator('#clock')).toHaveText('19:59');
-  for(let i=0;i<3;i++){await page.locator('.object').nth(i).click();await skipCutscene(page);}
+  await investigateRoom(page);
   await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();
   await expect(page.locator('#cutsceneChapter')).toHaveText('Room 1 cleared · digit 6 recovered');
   await page.clock.runFor(5000);await expect(page.locator('#cutscene')).not.toBeVisible();

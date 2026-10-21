@@ -1,9 +1,9 @@
 const {skipCutscene}=require('./cutscene-helper');
 const {test,expect}=require('@playwright/test');
 const {playTurn}=require('./snake-helper');
+const {investigateRoom}=require('./exploration-helper');
 async function inspect(page) {
-  const count=await page.locator('.object').count();
-  for(let i=0;i<count;i++){await page.locator('.object').nth(i).click();await skipCutscene(page);}
+  await investigateRoom(page);
 }
 async function choice(page,group,letter) {
   await page.locator(`[data-group="${group}"] button`).filter({hasText:new RegExp(`^${letter} ·`)}).click();
@@ -97,6 +97,7 @@ test('last team life resets all earned progress and persists the fresh game',asy
   await expect(page.locator('#feedback')).toContainText('whole rescue has restarted');
   await expect(page.locator('#checkBtn')).toBeDisabled();
   expect(await page.evaluate(()=>Snake.snapshot().cleared)).toEqual([0,0]);
+  expect(await page.evaluate(()=>Exploration.snapshot().every(s=>!s.done))).toBe(true);
   await page.reload();await page.locator('#enterBtn').click();await skipCutscene(page);
   await expect(page.locator('#title')).toContainText('Clockmaker');
   await expect(page.locator('#lives')).toHaveText('5 / 5 lives');
