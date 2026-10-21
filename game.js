@@ -49,11 +49,12 @@ function resumeGame() {
   if(index===rooms.length) { renderFinal(); return show('final'); }
   render(); show('game');
 }
-function startGame() {
+function startGame(withIntro=true) {
   Snake.reset(); lives=TEAM_LIVES; clearInterval(timer); index=0; code=[]; remaining=1200; selected={}; inspected=[]; answers={}; jars=[]; started=true; won=false; running=true; deadline=Date.now()+remaining*1000;
   el('finalCode').value=''; el('finalFeedback').textContent='';
   el('enterBtn').textContent='Continue your rescue →';
   timer=setInterval(tick,1000); render(); show('game'); save();
+  if(withIntro)Cutscene.play(0);
 }
 function tick() {
   if(!running) return;
@@ -154,6 +155,8 @@ function checkAnswer() {
   if(index===rooms.length) {renderFinal();show('final');}
   else {render();show('game');el('feedback').textContent='✓ Lock opened! '+r.reveal;}
   save();
+  document.querySelector('.lock-effect')?.remove();
+  Cutscene.play(index);
 }
 function updateLives() {
   el('teamStatus').classList.toggle('hidden',!started||won);
@@ -165,7 +168,7 @@ function loseLife(reason,target='feedback') {
   playLockEffect(false);
   lives--;
   if(lives<=0) {
-    startGame(); el('feedback').className='feedback error';
+    startGame(false); el('feedback').className='feedback error';
     el('feedback').textContent=reason+' No team lives remain — the whole rescue has restarted with five lives. All digits and arcade levels have been cleared.';
     return false;
   }
@@ -178,7 +181,7 @@ function renderFinal() {
   updateClock();
 }
 function unlock() {
-  if(val('finalCode')===code.join('') && code.length===rooms.length) {playLockEffect(true,index,true);running=false;won=true;save();show('win');celebrate();}
+  if(val('finalCode')===code.join('') && code.length===rooms.length) {playLockEffect(true,index,true);running=false;won=true;save();show('win');celebrate();document.querySelector('.lock-effect')?.remove();Cutscene.play(7);}
   else {loseLife('The painting remains shut. Check all six digits and their order.', 'finalFeedback');}
 }
 function celebrate() {
