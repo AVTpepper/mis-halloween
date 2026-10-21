@@ -4,7 +4,6 @@ const path=require('node:path');
 const {spawnSync}=require('node:child_process');
 const ffmpeg=require('ffmpeg-static');
 const sources=[
-  ['clock','Mechanical movement of pendulum clock.webm',0],
   ['potion','Chemical traffic light.webm',0],
   ['gallery','Freer Gallery of Art.webm',18],
   ['robot','4n robot.webm',1],
@@ -16,7 +15,9 @@ const originals=path.join(root,'artifacts','source-videos');
 fs.mkdirSync(output,{recursive:true});fs.mkdirSync(originals,{recursive:true});
 function run(args){const result=spawnSync(ffmpeg,['-hide_banner','-loglevel','error','-y',...args],{encoding:'utf8'});if(result.status!==0)throw new Error(result.stderr);}
 (async()=>{
-  const credits=[];
+  const creditsFile=path.join(output,'credits.json');
+  const originalClock=fs.existsSync(creditsFile)?JSON.parse(fs.readFileSync(creditsFile,'utf8')).find(c=>c.key==='clock-animated'):null;
+  const credits=originalClock?[originalClock]:[];
   for(const [key,title,start] of sources){
     const api=new URL('https://commons.wikimedia.org/w/api.php');
     api.search=new URLSearchParams({action:'query',format:'json',titles:'File:'+title,prop:'imageinfo',iiprop:'url|size|extmetadata'});

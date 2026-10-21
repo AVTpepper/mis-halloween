@@ -1,12 +1,12 @@
 [
   {
-    "key": "clock",
-    "title": "Mechanical movement of pendulum clock.webm",
-    "source": "https://commons.wikimedia.org/wiki/File:Mechanical_movement_of_pendulum_clock.webm",
-    "author": "Darklanlan",
-    "license": "CC0",
-    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-    "changes": "Excerpted, muted, scaled and letterboxed; no change to the depicted event."
+    "key": "clock-animated",
+    "title": "The Clockmaker’s Secret — animated clocks",
+    "source": "https://github.com/AVTpepper/mis-halloween",
+    "author": "The Midnight Museum project",
+    "license": "Original project animation",
+    "licenseUrl": "",
+    "changes": "Original animated clock hands, pendulums, gears and chime rings, rendered as an eight-second silent MP4."
   },
   {
     "key": "potion",
