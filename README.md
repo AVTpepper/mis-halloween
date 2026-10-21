@@ -1,6 +1,8 @@
 # The Midnight Museum — Classroom Edition
 
-A static, Chromebook-friendly Halloween escape room. Teams investigate six rooms, collect six digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the four website files on GitHub Pages.
+A static, Chromebook-friendly Halloween escape room. Teams investigate six rooms, collect six digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the five website files on GitHub Pages.
+
+Skippable five-second cutscenes introduce the museum, connect each solved room to the next, reveal recovered digits, and celebrate Pip’s rescue. Animated doors, glowing relics, floating Pip, stars and mist set the scene. Press Continue or Escape to skip; the team countdown pauses during the scene and resumes automatically afterward. Reduced-motion preferences disable movement. Refreshing during a scene restores the saved game paused; press Resume to continue.
 
 ## Classroom planning
 
@@ -45,7 +47,7 @@ Repository: https://github.com/AVTpepper/mis-halloween
 2. Push to `main`, or run **Deploy classroom website** manually in the Actions tab.
 3. Check the workflow’s deployment link. The expected URL is `https://avtpepper.github.io/mis-halloween/`.
 
-The workflow publishes only `index.html`, `styles.css`, `game.js` and `snake.js`. All asset paths are relative so the repository subpath works. Alternatively, select **Deploy from a branch → main → /(root)**; the same four files work directly without a build. Use one deployment method.
+The workflow publishes only `index.html`, `styles.css`, `game.js`, `snake.js` and `cutscenes.js`. All asset paths are relative so the repository subpath works. Alternatively, select **Deploy from a branch → main → /(root)**; the same five files work directly without a build. Use one deployment method.
 
 ## Google Forms costume voting
 
@@ -63,4 +65,4 @@ Until a form is supplied, students see a friendly waiting message. Voting is hos
 
 For browser checks, install Node.js and Microsoft Edge, then run `npm ci` followed by `npm test`. Playwright launches Edge against a local static server and covers the complete six-room rescue, both 10-level Snake turns through actual controls, a crash and retained teammate progress, life loss at puzzle and final locks, zero-life reset, refresh recovery, jar model, pause, timeout, restart, mobile overflow and form embedding. Development dependencies are unnecessary for classroom use.
 
-On Windows, run `powershell -File scripts/package.ps1` to create `artifacts/midnight-museum-classroom.zip`. It contains the four website files plus this teacher guide. Extract all files together and open `index.html`. The generated ZIP is ignored by Git; source files and the packaging script are tracked.
+On Windows, run `powershell -File scripts/package.ps1` to create `artifacts/midnight-museum-classroom.zip`. It contains the five website files plus this teacher guide. Extract all files together and open `index.html`. The generated ZIP is ignored by Git; source files and the packaging script are tracked.
