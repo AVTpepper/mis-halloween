@@ -103,9 +103,12 @@ function renderObjects() {
   if(index===5 && ready) Snake.mount();
 }
 function inspectObject(i) {
+  const newlyFound=!inspected.includes(i);
   if(!inspected.includes(i)) inspected.push(i);
   renderObjects(); save();
-  el('exploration').querySelectorAll('.object')[i].focus();
+  const object=el('exploration').querySelectorAll('.object')[i];
+  if(newlyFound)object.classList.add('clue-new');
+  object.focus();
 }
 function paintJar(button,i) { button.classList.toggle('filled',jars.includes(i)); button.setAttribute('aria-pressed',String(jars.includes(i))); }
 function updateJars() { el('jarCount').textContent=`${jars.length} of 12 jars filled. Model three-fourths, then enter your answer.`; }
@@ -116,11 +119,36 @@ function choose(group,value,button) {
   button.classList.add('selected');button.setAttribute('aria-pressed','true');save();
 }
 function showHint() {el('feedback').className='feedback';el('feedback').textContent='👻 Pip whispers: '+rooms[index].hint;}
+let lockEffectTimer=null;
+function playLockEffect(success,roomIndex=index,finalRescue=false) {
+  clearTimeout(lockEffectTimer);
+  document.querySelector('.lock-effect')?.remove();
+  const effect=document.createElement('div');
+  effect.className='lock-effect';
+  effect.dataset.outcome=success?'success':'failure';
+  effect.dataset.room=finalRescue?'rescue':String(roomIndex);
+  effect.setAttribute('aria-hidden','true');
+  const r=rooms[roomIndex];
+  const sparks=Array.from({length:12},(_,i)=>`<i class="lock-spark" style="--angle:${i*30}deg;--delay:${i*18}ms"></i>`).join('');
+  effect.innerHTML=`<div class="lock-stage">
+    <div class="lock-motif">${finalRescue?'👻':r?.scene||'🚪'}</div>
+    <div class="lock-art">${sparks}<svg viewBox="0 0 120 130" focusable="false">
+      <path class="lock-shackle" d="M34 57 V34 C34 0 86 0 86 34 V57"/>
+      <rect class="lock-body" x="17" y="52" width="86" height="68" rx="15"/>
+      <circle class="lock-keyhole" cx="60" cy="79" r="8"/><path class="lock-keyhole" d="M56 84 H64 L67 101 H53 Z"/>
+    </svg></div>
+    <strong>${success?(finalRescue?'Pip is free!':'Lock opened!'):'Lock sealed'}</strong>
+    <span>${success?(finalRescue?'The painting releases its magic.':`Digit ${r.digit} recovered`):'One team life lost'}</span>
+  </div>`;
+  document.body.append(effect);
+  lockEffectTimer=setTimeout(()=>effect.remove(),success?1550:950);
+}
 function checkAnswer() {
   if(index===5 && !Snake.complete())return;
   if(!objects[index].every((o,i)=>inspected.includes(i))) return;
   const r=rooms[index];
   if(!r.validate()) {loseLife('The lock stays closed. Revisit the clues and discuss your answers.');return;}
+  playLockEffect(true);
   code.push(r.digit);index++;selected={};inspected=[];answers={};jars=[];
   if(index===rooms.length) {renderFinal();show('final');}
   else {render();show('game');el('feedback').textContent='✓ Lock opened! '+r.reveal;}
@@ -133,6 +161,7 @@ function updateLives() {
 }
 // Returns false when the whole rescue was restarted.
 function loseLife(reason,target='feedback') {
+  playLockEffect(false);
   lives--;
   if(lives<=0) {
     startGame(); el('feedback').className='feedback error';
@@ -148,7 +177,7 @@ function renderFinal() {
   updateClock();
 }
 function unlock() {
-  if(val('finalCode')===code.join('') && code.length===rooms.length) {running=false;won=true;save();show('win');celebrate();}
+  if(val('finalCode')===code.join('') && code.length===rooms.length) {playLockEffect(true,index,true);running=false;won=true;save();show('win');celebrate();}
   else {loseLife('The painting remains shut. Check all six digits and their order.', 'finalFeedback');}
 }
 function celebrate() {

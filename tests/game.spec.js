@@ -17,7 +17,13 @@ test('team explores every room, recovers progress, and rescues Pip',async({page}
   await expect(page.locator('#checkBtn')).toBeDisabled();
   await inspect(page);await page.locator('#value1').fill('12');await page.locator('#checkBtn').click();
   await expect(page.locator('#feedback')).toContainText('lock stays closed');
+  await expect(page.locator('.lock-effect')).toHaveAttribute('data-outcome','failure');
+  await page.clock.runFor(250);
+  await page.screenshot({path:'artifacts/lock-failure.png'});
   await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();
+  await expect(page.locator('.lock-effect')).toHaveAttribute('data-outcome','success');
+  await page.clock.runFor(500);
+  await page.screenshot({path:'artifacts/lock-success.png'});
   await inspect(page);await page.locator('#value2a').fill('8');
   for(let i=0;i<9;i++)await page.locator('.jar').nth(i).click();
   await expect(page.locator('#jarCount')).toContainText('9 of 12');
@@ -62,6 +68,17 @@ test('team explores every room, recovers progress, and rescues Pip',async({page}
   await expect(page.locator('#win')).toBeVisible();
   await page.reload();await page.locator('#enterBtn').click();await expect(page.locator('#win')).toBeVisible();
   expect(errors).toEqual([]);
+});
+test('lock feedback respects reduced motion and never blocks the next puzzle',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');await page.locator('#enterBtn').click();
+  await inspect(page);await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();
+  await expect(page.locator('.lock-effect')).toHaveAttribute('aria-hidden','true');
+  expect(await page.locator('.lock-stage').evaluate(e=>getComputedStyle(e).animationName)).toBe('none');
+  expect(await page.locator('.lock-effect').evaluate(e=>getComputedStyle(e).pointerEvents)).toBe('none');
+  await inspect(page);await page.locator('#value2a').fill('8');
+  await expect(page.locator('#value2a')).toHaveValue('8');
+  await expect(page.locator('.footer p')).toHaveText('pyp 6 - classroom halloween escape room');
 });
 test('last team life resets all earned progress and persists the fresh game',async({page})=>{
   await page.goto('/');await page.locator('#enterBtn').click();
