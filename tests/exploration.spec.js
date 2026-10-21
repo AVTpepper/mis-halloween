@@ -1,6 +1,25 @@
 const {test,expect}=require('@playwright/test');
 const {skipCutscene}=require('./cutscene-helper');
 const {collectVisible,solveMechanism,investigateRoom}=require('./exploration-helper');
+test('all scene objects and labels stay separate at desktop tablet and phone widths',async({page})=>{
+  await page.goto('/');
+  for(const width of [320,375,768,1280]){
+    await page.setViewportSize({width,height:900});
+    for(let room=0;room<6;room++){
+      await page.evaluate(room=>{Exploration.restore(Exploration.snapshot().map(s=>({...s,done:true,failed:true,passed:true})));index=room;started=true;inspected=[0,1,2];render();show('game');},room);
+      const geometry=await page.locator('.room-scene').evaluate(scene=>({
+        captionTop:scene.querySelector('.scene-caption').getBoundingClientRect().top,
+        objects:Array.from(scene.querySelectorAll('.scene-object')).filter(e=>!e.classList.contains('hidden')).map(e=>{const r=e.getBoundingClientRect();return {label:e.textContent,left:r.left,top:r.top,right:r.right,bottom:r.bottom};})
+      }));
+      expect(geometry.objects).toHaveLength(3);
+      for(let i=0;i<geometry.objects.length;i++){
+        const a=geometry.objects[i];expect(a.bottom,`Room ${room+1}, ${width}px: caption must not cover ${a.label}`).toBeLessThanOrEqual(geometry.captionTop);
+        for(let j=i+1;j<geometry.objects.length;j++){const b=geometry.objects[j],overlaps=Math.min(a.right,b.right)>Math.max(a.left,b.left)&&Math.min(a.bottom,b.bottom)>Math.max(a.top,b.top);expect(overlaps,`Room ${room+1}, ${width}px: ${a.label} overlaps ${b.label}`).toBe(false);}
+      }
+      if(room===1&&(width===375||width===1280))await page.locator('.room-scene').screenshot({path:`artifacts/potion-spaced-${width}.png`});
+    }
+  }
+});
 test('hidden compartments require experimentation and collected clues survive refresh',async({page})=>{
   await page.goto('/');await page.locator('#enterBtn').click();await skipCutscene(page);
   await expect(page.locator('.object').nth(2)).not.toBeVisible();
