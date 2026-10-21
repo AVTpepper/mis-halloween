@@ -1,7 +1,7 @@
 const Cutscene=(()=>{
   let timer=null, resumeCountdown=false, returnFocus=null;
   const films=[
-    {file:'clock',description:'Close-up footage of a working pendulum clock mechanism.',credit:'Darklanlan · CC0',source:'Mechanical_movement_of_pendulum_clock.webm'},
+    {file:'clock-animated',description:'Original animated clocks with turning hands, swinging pendulums, rotating gears and glowing chimes.',credit:'The Midnight Museum · Original animation',source:null},
     {file:'potion',description:'Laboratory footage showing a colour-changing liquid reaction.',credit:'Junsuda.dha · CC BY-SA 4.0',source:'Chemical_traffic_light.webm'},
     {file:'gallery',description:'Camera footage of the Freer Gallery of Art.',credit:'OkMonika · CC BY-SA 3.0',source:'Freer_Gallery_of_Art.webm'},
     {file:'robot',description:'Test footage of a small four-legged walking robot.',credit:'Palapa · Public domain',source:'4n_robot.webm'},
@@ -57,7 +57,7 @@ const Cutscene=(()=>{
     document.getElementById('cutsceneChapter').textContent=`Investigation · ${rooms[room].title}`;
     document.getElementById('cutsceneTitle').textContent=objects[room][object][1];
     document.getElementById('cutsceneStory').textContent=objects[room][object][2];
-    document.getElementById('filmDescription').textContent=film.description+' Illustrative footage; the museum story and clue are fictional.';
+    document.getElementById('filmDescription').textContent=film.description+' Illustrative scene; the museum story and clue are fictional.';
     const credit=document.getElementById('filmCredit');
     credit.textContent=film.credit+' · trimmed, muted and resized';
     credit.href=film.source?'https://commons.wikimedia.org/wiki/File:'+film.source:'https://github.com/AVTpepper/mis-halloween';

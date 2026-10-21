@@ -6,8 +6,12 @@ test('investigating plays local video, pauses time and retains each clue',async(
   await expect(page.locator('#cutscene')).toBeVisible();
   await expect(page.locator('#cutsceneTitle')).toHaveText('Inspect brass clock');
   await expect(page.locator('#cutsceneStory')).toContainText('every 9 minutes');
-  await expect(page.locator('#investigationVideo')).toHaveAttribute('src','assets/investigations/clock.mp4');
+  await expect(page.locator('#investigationVideo')).toHaveAttribute('src','assets/investigations/clock-animated.mp4');
   await page.waitForFunction(()=>{const v=document.getElementById('investigationVideo');return v.readyState>=2&&v.videoWidth===960&&v.currentTime>.1;});
+  const frame=()=>page.locator('#investigationVideo').evaluate(v=>{const c=document.createElement('canvas');c.width=96;c.height=54;const ctx=c.getContext('2d');ctx.drawImage(v,0,0,96,54);return Array.from(ctx.getImageData(0,0,96,54).data);});
+  const first=await frame();await page.waitForTimeout(500);const second=await frame();
+  let changed=0;for(let i=0;i<first.length;i+=4)if(Math.abs(first[i]-second[i])+Math.abs(first[i+1]-second[i+1])+Math.abs(first[i+2]-second[i+2])>30)changed++;
+  expect(changed,'The clock clip must contain visibly moving artwork, not a still image').toBeGreaterThan(30);
   const pausedTime=await page.locator('#clock').textContent();
   await page.clock.fastForward(30000);await expect(page.locator('#clock')).toHaveText(pausedTime);
   await expect(page.locator('#cutscene')).toBeVisible();
@@ -27,7 +31,7 @@ test('reduced motion leaves footage paused and a failed clip never blocks the te
   await page.locator('.object').nth(0).click();
   expect(await page.locator('#investigationVideo').evaluate(v=>v.paused)).toBe(true);
   await skipCutscene(page);
-  await page.route('**/assets/investigations/clock.mp4',route=>route.abort());
+  await page.route('**/assets/investigations/clock-animated.mp4',route=>route.abort());
   await page.locator('.object').nth(1).click();
   await page.locator('#investigationVideo').evaluate(v=>v.play().catch(()=>{}));
   await expect(page.locator('#filmError')).toBeVisible();
