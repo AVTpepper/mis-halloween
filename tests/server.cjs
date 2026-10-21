@@ -5,9 +5,9 @@ const root = path.resolve(__dirname, '..');
 http.createServer((req,res)=>{
   const files = {'/':'index.html','/index.html':'index.html','/game.js':'game.js','/exploration.js':'exploration.js','/snake.js':'snake.js','/cutscenes.js':'cutscenes.js','/styles.css':'styles.css'};
   const pathname=req.url?.split('?')[0];
-  const file = files[pathname] || (/^\/assets\/investigations\/[a-z-]+\.(mp4|jpg|json|html)$/.test(pathname)?pathname.slice(1):null);
+  const file = files[pathname];
   if(!file) {res.writeHead(404);return res.end();}
-  const types={'.js':'text/javascript','.css':'text/css','.mp4':'video/mp4','.jpg':'image/jpeg','.json':'application/json','.html':'text/html'};
+  const types={'.js':'text/javascript','.css':'text/css','.html':'text/html'};
   res.setHeader('Content-Type',types[path.extname(file)]);
   const data=fs.readFileSync(path.join(root,file));
   res.setHeader('Accept-Ranges','bytes');

@@ -10,6 +10,8 @@ async function choice(page,group,letter) {
 }
 test('team explores every room, recovers progress, and rescues Pip',async({page})=>{
   test.setTimeout(90000);
+  // Predictable food placement keeps the test navigator from randomly trapping itself.
+  await page.addInitScript(()=>{Math.random=()=>0;});
   await page.clock.install({time:new Date('2026-10-21T12:00:00Z')});await page.clock.pauseAt(new Date('2026-10-21T12:00:01Z'));
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');
