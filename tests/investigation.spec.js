@@ -1,0 +1,36 @@
+const {test,expect}=require('@playwright/test');
+const {skipCutscene}=require('./cutscene-helper');
+test('investigating plays local video, pauses time and retains each clue',async({page})=>{
+  await page.clock.install();await page.goto('/');await page.locator('#enterBtn').click();await skipCutscene(page);
+  await page.locator('.object').nth(0).click();
+  await expect(page.locator('#cutscene')).toBeVisible();
+  await expect(page.locator('#cutsceneTitle')).toHaveText('Inspect brass clock');
+  await expect(page.locator('#cutsceneStory')).toContainText('every 9 minutes');
+  await expect(page.locator('#investigationVideo')).toHaveAttribute('src','assets/investigations/clock.mp4');
+  await page.waitForFunction(()=>{const v=document.getElementById('investigationVideo');return v.readyState>=2&&v.videoWidth===960&&v.currentTime>.1;});
+  const pausedTime=await page.locator('#clock').textContent();
+  await page.clock.fastForward(30000);await expect(page.locator('#clock')).toHaveText(pausedTime);
+  await expect(page.locator('#cutscene')).toBeVisible();
+  await page.setViewportSize({width:375,height:812});
+  expect(await page.locator('#cutscene').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
+  await page.screenshot({path:'artifacts/investigation-mobile.png'});
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.cluebook')).toContainText('every 9 minutes');
+  await expect(page.locator('#checkBtn')).toBeDisabled();
+  await page.locator('.object').nth(0).click();await expect(page.locator('#cutscene')).toBeVisible();
+  await skipCutscene(page);await expect(page.locator('#lives')).toHaveText('5 / 5 lives');
+  expect(await page.locator('#investigationVideo').evaluate(v=>v.paused&& !v.hasAttribute('src'))).toBe(true);
+});
+test('reduced motion leaves footage paused and a failed clip never blocks the text clue',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');await page.locator('#enterBtn').click();await skipCutscene(page);
+  await page.locator('.object').nth(0).click();
+  expect(await page.locator('#investigationVideo').evaluate(v=>v.paused)).toBe(true);
+  await skipCutscene(page);
+  await page.route('**/assets/investigations/clock.mp4',route=>route.abort());
+  await page.locator('.object').nth(1).click();
+  await page.locator('#investigationVideo').evaluate(v=>v.play().catch(()=>{}));
+  await expect(page.locator('#filmError')).toBeVisible();
+  await expect(page.locator('#cutsceneStory')).toContainText('12 minutes');
+  await skipCutscene(page);await expect(page.locator('.cluebook')).toContainText('12 minutes');
+});

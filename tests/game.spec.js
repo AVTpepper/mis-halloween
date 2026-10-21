@@ -3,14 +3,14 @@ const {test,expect}=require('@playwright/test');
 const {playTurn}=require('./snake-helper');
 async function inspect(page) {
   const count=await page.locator('.object').count();
-  for(let i=0;i<count;i++) await page.locator('.object').nth(i).click();
+  for(let i=0;i<count;i++){await page.locator('.object').nth(i).click();await skipCutscene(page);}
 }
 async function choice(page,group,letter) {
   await page.locator(`[data-group="${group}"] button`).filter({hasText:new RegExp(`^${letter} ·`)}).click();
 }
 test('team explores every room, recovers progress, and rescues Pip',async({page})=>{
   test.setTimeout(90000);
-  await page.clock.install();await page.clock.pauseAt(new Date());
+  await page.clock.install({time:new Date('2026-10-21T12:00:00Z')});await page.clock.pauseAt(new Date('2026-10-21T12:00:01Z'));
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');
   await page.getByRole('button',{name:'Escape room',exact:true}).click();await skipCutscene(page);

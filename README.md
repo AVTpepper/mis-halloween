@@ -1,8 +1,12 @@
 # The Midnight Museum — Classroom Edition
 
-A static, Chromebook-friendly Halloween escape room. Teams investigate six rooms, collect six digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the five website files on GitHub Pages.
+A static, Chromebook-friendly Halloween escape room. Teams investigate six rooms, collect six digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the five website files and the `assets` directory on GitHub Pages.
 
 Skippable five-second cutscenes introduce the museum, connect each solved room to the next, reveal recovered digits, and celebrate Pip’s rescue. Animated doors, glowing relics, floating Pip, stars and mist set the scene. Press Continue or Escape to skip; the team countdown pauses during the scene and resumes automatically afterward. Reduced-motion preferences disable movement. Refreshing during a scene restores the saved game paused; press Resume to continue.
+
+Inspecting any object also opens an **actual eight-second video clip** with that object's full clue. There are six locally hosted clips shared by the objects in their room: working clockwork, a laboratory liquid reaction, museum artwork, a walking robot, handwriting, and an original screen recording of this site's Snake game. These are illustrative footage, not recordings of the fictional events or of the fictional culprit. All clues remain in text. The clips are silent, have playback/replay controls, and can be dismissed immediately with Continue or Escape. The countdown stays paused until the student continues; the window does not close before they finish reading. Reduced-motion mode leaves the video paused until explicitly played. Missing or blocked video never prevents reading the clue or completing the puzzle.
+
+Clips, poster images, and full source/author/licence/change credits live in `assets/investigations/`. The player links to `assets/investigations/credits.html`. Stock excerpts retain their source licences (CC0/public domain, CC BY, or CC BY-SA as specified individually); the arcade footage is an original recording. Keep the media credits with any copy of the website. The complete video set is approximately 4.5 MB and is included in the offline ZIP. Clips load only when an object is opened.
 
 ## Classroom planning
 
@@ -47,7 +51,7 @@ Repository: https://github.com/AVTpepper/mis-halloween
 2. Push to `main`, or run **Deploy classroom website** manually in the Actions tab.
 3. Check the workflow’s deployment link. The expected URL is `https://avtpepper.github.io/mis-halloween/`.
 
-The workflow publishes only `index.html`, `styles.css`, `game.js`, `snake.js` and `cutscenes.js`. All asset paths are relative so the repository subpath works. Alternatively, select **Deploy from a branch → main → /(root)**; the same five files work directly without a build. Use one deployment method.
+The workflow publishes `index.html`, `styles.css`, `game.js`, `snake.js`, `cutscenes.js` and the `assets` directory. All asset paths are relative so the repository subpath works. Alternatively, select **Deploy from a branch → main → /(root)**; the same files and assets work directly without a build. Use one deployment method.
 
 ## Google Forms costume voting
 
@@ -65,4 +69,6 @@ Until a form is supplied, students see a friendly waiting message. Voting is hos
 
 For browser checks, install Node.js and Microsoft Edge, then run `npm ci` followed by `npm test`. Playwright launches Edge against a local static server and covers the complete six-room rescue, both 10-level Snake turns through actual controls, a crash and retained teammate progress, life loss at puzzle and final locks, zero-life reset, refresh recovery, jar model, pause, timeout, restart, mobile overflow and form embedding. Development dependencies are unnecessary for classroom use.
 
-On Windows, run `powershell -File scripts/package.ps1` to create `artifacts/midnight-museum-classroom.zip`. It contains the five website files plus this teacher guide. Extract all files together and open `index.html`. The generated ZIP is ignored by Git; source files and the packaging script are tracked.
+On Windows, run `powershell -File scripts/package.ps1` to create `artifacts/midnight-museum-classroom.zip`. It contains the five website files, the complete assets directory and this teacher guide. Extract all files together and open `index.html`. The generated ZIP is ignored by Git; source files and the packaging script are tracked.
+
+The checked-in MP4s require no video tooling for playback or deployment. To regenerate the stock clips, run `node scripts/prepare-videos.cjs` then `node scripts/video-credits.cjs` after `npm ci`; FFmpeg is a development dependency. To regenerate the arcade recording, start `node tests/server.cjs` in another terminal, then run `node scripts/record-arcade.cjs`. The capture uses the actual Snake canvas and keyboard controls. Original downloaded media stays under ignored `artifacts/source-videos/`.
