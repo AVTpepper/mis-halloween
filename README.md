@@ -1,14 +1,22 @@
 # The Midnight Museum — Classroom Edition
 
-A static, Chromebook-friendly Halloween escape room. Teams investigate five rooms, collect five digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the three website files on GitHub Pages.
+A static, Chromebook-friendly Halloween escape room. Teams investigate six rooms, collect six digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the four website files on GitHub Pages.
 
 ## Classroom planning
 
-Allow 5 minutes to introduce Pip and form teams, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for about 3 minutes per room, allowing time for discussion and the final code. The countdown begins when a team enters the museum and continues through the final door. Pause is available; reaching zero permits teams to continue solving.
+Allow 5 minutes to introduce Pip and form teams, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for 2–3 minutes per curriculum room and reserve roughly 4–5 minutes for the two arcade turns and final code. Timing depends on players’ Snake experience; use Pause when introducing the controls. The countdown begins when a team enters the museum and continues through the final door. Pause is available; reaching zero permits teams to continue solving.
 
 Each room begins with clickable objects that reveal clues in a notebook. Inspect every object to reveal the lock challenge. Potion jars can be toggled to model three-fourths of 12; the team still enters its own numerical answer. Hints and retry feedback support discussion. The robot and gallery use evidence-based decisions, while the poem combines persuasion with an acrostic.
 
 Progress, clue discoveries, answers and the timer are saved in this browser's local storage when available. The countdown continues while the tab is closed unless paused. Refresh, select Continue, and pick up where you left off. Use **Start a new team game** between teams; restarting an existing game asks for confirmation. Storage restrictions may prevent recovery, but the game still works. Teams should use one device each. No student names or answers are sent to a server by the escape game.
+
+## Team lives and the Serpent Arcade
+
+Teams start with **five shared lives**. Every incorrect Check the lock submission, incorrect final rescue code, or Snake crash costs one life. Hints, clue inspection and pausing are free. The remaining lives appear above the game and persist across refreshes. At zero lives the rescue automatically starts over: all room digits, answers, Snake levels and the countdown reset. Starting the new attempt restores five lives.
+
+Snake is the sixth challenge, preserving all five curriculum rooms. Two teammates take **sequential turns on the same device**. Player 1 must clear 10 levels, then Player 2 must clear 10. One gold spark clears one short level; the snake grows and gradually speeds up. Walls and the snake’s body are hazards. A crash costs a team life and resets the active player’s run to zero; an already completed Player 1 turn is retained until the whole team loses its last life. Both players must reach 10/10 before the lock button enables and digit 7 can be earned.
+
+Use arrow keys, WASD, or the on-screen direction buttons. Start/resume the turn explicitly. Space pauses while the board has focus; the Pause turn button works at any time. Navigating away, hiding the tab, refreshing or pausing the team countdown safely pauses the snake. Refresh restores its board, each player's cleared levels and shared lives; it never starts moving automatically. The team countdown continues as described above. The updated rules use a new save version, so older five-room saves begin a fresh attempt.
 
 ## Curriculum connections and teacher answer key
 
@@ -21,8 +29,9 @@ The supplied starting website identifies PYP 6 slide decks and EDM Unit 2 topics
 | Gallery of Misleading Headlines | Observation versus inference; framing and responsible reporting; Perceptions and Misconceptions / The Boy Who Fooled the World | Observation B: painting on floor at 21:06. Headline B: cause unknown. B is alphabet position 2 | 2 |
 | Rescue Robot That Failed | Design cycle, test evidence and technology limitations; Technological Advancements | B: improve and test again. C: add a low-light sensor and test in darkness. Improve is stage 4 of this puzzle’s checklist | 4 |
 | Poet Behind the Portrait | Persuasive claim, audience, evidence, modal verb “should”, spoken-word poetry | Claim B supports a recommendation with evidence. First letters spell CHECK, five letters | 5 |
+| Serpent Arcade | Planning, spatial reasoning and turn-taking | Both players clear 10 Snake levels each; collect the arcade digit | 7 |
 
-**Final rescue code: 69245.** Teacher answers are kept off the student interface. This is a static educational activity; source inspection can still reveal answers.
+**Final rescue code: 692457.** Teacher answers are kept off the student interface. This is a static educational activity; source inspection can still reveal answers.
 
 ## GitHub Pages
 
@@ -32,7 +41,7 @@ Repository: https://github.com/AVTpepper/mis-halloween
 2. Push to `main`, or run **Deploy classroom website** manually in the Actions tab.
 3. Check the workflow’s deployment link. The expected URL is `https://avtpepper.github.io/mis-halloween/`.
 
-The workflow publishes only `index.html`, `styles.css` and `game.js`. All asset paths are relative so the repository subpath works. Alternatively, select **Deploy from a branch → main → /(root)**; the same three files work directly without a build. Use one deployment method.
+The workflow publishes only `index.html`, `styles.css`, `game.js` and `snake.js`. All asset paths are relative so the repository subpath works. Alternatively, select **Deploy from a branch → main → /(root)**; the same four files work directly without a build. Use one deployment method.
 
 ## Google Forms costume voting
 
@@ -46,8 +55,8 @@ Until a form is supplied, students see a friendly waiting message. Voting is hos
 
 ## Editing, verification and ZIP
 
-`game.js` contains puzzle content (`rooms`), inspectable clues (`objects`), game flow and the form setting. Edit appearance in `styles.css` and page structure in `index.html`.
+`game.js` contains puzzle content (`rooms`), inspectable clues (`objects`), game flow and the form setting. `snake.js` contains the arcade rules, controls, drawing and saved board. Edit appearance in `styles.css` and page structure in `index.html`.
 
-For browser checks, install Node.js and Microsoft Edge, then run `npm ci` followed by `npm test`. Playwright launches Edge against a local static server and covers the complete rescue, mistakes, refresh recovery, jar model, pause, timeout, restart, mobile overflow and form embedding. Development dependencies are unnecessary for classroom use.
+For browser checks, install Node.js and Microsoft Edge, then run `npm ci` followed by `npm test`. Playwright launches Edge against a local static server and covers the complete six-room rescue, both 10-level Snake turns through actual controls, a crash and retained teammate progress, life loss at puzzle and final locks, zero-life reset, refresh recovery, jar model, pause, timeout, restart, mobile overflow and form embedding. Development dependencies are unnecessary for classroom use.
 
-On Windows, run `powershell -File scripts/package.ps1` to create `artifacts/midnight-museum-classroom.zip`. It contains the three website files plus this teacher guide. Extract all files together and open `index.html`. The generated ZIP is ignored by Git; source files and the packaging script are tracked.
+On Windows, run `powershell -File scripts/package.ps1` to create `artifacts/midnight-museum-classroom.zip`. It contains the four website files plus this teacher guide. Extract all files together and open `index.html`. The generated ZIP is ignored by Git; source files and the packaging script are tracked.

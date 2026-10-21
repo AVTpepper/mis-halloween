@@ -22,7 +22,7 @@ jobs:
       - name: Prepare static files
         run: |
           mkdir public
-          cp index.html styles.css game.js public/
+          cp index.html styles.css game.js snake.js public/
           touch public/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
