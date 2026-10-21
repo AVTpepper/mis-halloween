@@ -38,7 +38,8 @@ function restore() {
 }
 function show(section) {
   Snake.pause(); updateLives();
-  ['home','game','final','win','vote'].forEach(x=>el(x).classList.toggle('hidden',x!==section));
+  if(section!=='teacher')lockTeacherRoom();
+  ['home','game','final','win','vote','teacher'].forEach(x=>el(x).classList.toggle('hidden',x!==section));
   window.scrollTo({top:0,behavior:'instant'});
   el('main').focus({preventScroll:true});
 }
@@ -185,6 +186,39 @@ function celebrate() {
   for(let i=0;i<45;i++) {const p=document.createElement('span');p.className='particle';p.setAttribute('aria-hidden','true');p.textContent=['✨','🎃','⭐','👻'][i%4];p.style.left=(Math.random()*100)+'%';p.style.animationDelay=(Math.random()*1.8)+'s';p.style.fontSize=(15+Math.random()*20)+'px';document.body.append(p);setTimeout(()=>p.remove(),6200);}
 }
 function requestRestart() { if(!started || window.confirm('Start a new team game? This clears the current team’s clues and timer.')) startGame(); }
+
+const teacherStages=[
+  {goal:'Find the least common multiple of 9 and 12.',answer:'36 minutes. Multiples of 9 are 9, 18, 27, 36; multiples of 12 are 12, 24, 36. The first shared multiple is 36. Take its ones digit: 6.',discussion:'How can you show that 36 is the first shared multiple, rather than just a shared multiple?'},
+  {goal:'Scale equivalent ratios and calculate a fraction of a quantity.',answer:'Part A: 8 purple drops. Multiply both parts of 3:2 by 4 to get 12:8. Part B: 9 jars, because 12 ÷ 4 × 3 = 9. The jars give digit 9.',discussion:'Why must both parts of the recipe be multiplied by the same number? Use the clickable jars to model three groups of three.'},
+  {goal:'Separate observation from inference and communicate responsibly.',answer:'Observation B: the painting was on the floor at 21:06. Headline B: “Painting falls; cause still unknown.” The camera does not establish who caused the fall. B is the second letter, giving digit 2.',discussion:'Which words in the dramatic headline make claims that the camera cannot support? What evidence would you need to identify a cause?'},
+  {goal:'Use testing evidence to identify a technology limitation and improve a design.',answer:'Part A: B, improve the design and test again. Part B: C, add a low-light sensor and test in darkness. Improve is stage 4 in the museum checklist, giving digit 4.',discussion:'How would you test whether the new sensor solves the problem? The numbered design cycle is a simplified version created for this puzzle.'},
+  {goal:'Choose a persuasive recommendation supported by evidence, then decode an acrostic.',answer:'Claim B recommends that the museum review all camera evidence and supplies a relevant reason. The first letters of the five poetry lines spell CHECK. Five letters gives digit 5.',discussion:'Identify the audience, the recommendation, the modal verb “should”, and the evidence. Read the poem aloud before reading its first letters downward.'},
+  {goal:'Plan routes, practise spatial reasoning and share responsibility through two arcade turns.',answer:'Player 1 must collect 10 gold sparks to clear 10 levels. Player 2 must then do the same. Only when both show 10/10 can the team check the lock and receive digit 7.',discussion:'Each spark grows and speeds up the snake. Use arrows, WASD or the on-screen controls. A wall or tail collision costs one team life and resets the active player to level zero; the completed teammate’s turn remains until all team lives are lost. Pause to discuss a safe route.'}
+];
+function lockTeacherRoom() {
+  el('teacherInfo').replaceChildren();
+  el('teacherInfo').classList.add('hidden');
+  el('teacherGate').classList.remove('hidden');
+  el('teacherCode').value='';el('teacherCode').removeAttribute('aria-invalid');el('teacherFeedback').textContent='';
+}
+function openTeacherRoom() {
+  if(started&&running)togglePause();
+  lockTeacherRoom();show('teacher');el('teacherCode').focus();
+}
+function unlockTeacherRoom(event) {
+  event.preventDefault();
+  if(el('teacherCode').value!=='halloween123') {
+    el('teacherCode').value='';el('teacherCode').setAttribute('aria-invalid','true');
+    el('teacherFeedback').textContent='That code is incorrect. Try again.';el('teacherCode').focus();return;
+  }
+  el('teacherCode').removeAttribute('aria-invalid');el('teacherCode').value='';
+  el('teacherGate').classList.add('hidden');
+  el('teacherInfo').innerHTML=`<div class="card"><h2>Plan the rescue</h2><p>Allow 5 minutes to introduce Pip, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for 2–3 minutes per curriculum room and reserve 4–5 minutes for the arcade and final code. Teams use one device; two teammates take the Snake turns.</p><p>The countdown pauses when you open this room. Return to the escape room and press Resume when ready. At zero time, teams may keep solving.</p><p><b>Five shared lives:</b> an incorrect puzzle submission, incorrect final code or Snake crash costs one life. Hints and inspecting objects are free. Losing the last life automatically resets all answers, digits, arcade progress and the timer, and restores five lives.</p><p>Progress is saved in the current browser when storage is available. Use Start a new team game between groups. Refresh restores progress but never starts the snake automatically.</p></div>
+    <div class="teacher-stages">${rooms.map((room,i)=>`<article class="card"><div class="tag">Stage ${i+1} · digit ${room.digit}</div><h2>${room.scene} ${room.title}</h2><p><b>Learning focus:</b> ${teacherStages[i].goal}</p><p><b>Answer and reasoning:</b> ${teacherStages[i].answer}</p><p><b>Discuss with students:</b> ${teacherStages[i].discussion}</p><p><b>Available hint:</b> ${room.hint}</p></article>`).join('')}</div>
+    <div class="card"><h2>The final painting</h2><p>Assemble the six digits in room order: <strong class="teacher-rescue-code">${rooms.map(room=>room.digit).join('')}</strong>. A wrong rescue code costs one life. A correct code releases Pip and starts the celebration.</p><h3>Costume awards setup</h3><p>Create a Google Form for funniest, scariest, most creative and best homemade costume; link its responses to Google Sheets. In game.js, set GOOGLE_FORM_URL to the published HTTPS responder link ending in /viewform. A forms.gle short link opens in a new tab. Use costume labels or nominee numbers and check school access settings on a student device.</p><h3>Curriculum and deployment notes</h3><p>The supplied curriculum links are PYP 6 maths, perception and responsibility, technology limitations, persuasion and poetry. The original six teaching resources were not included in this checkout, so their alignment has not been independently verified. The questions are original.</p><p>This static site works offline and on GitHub Pages. The README includes deployment, editing, voting and ZIP instructions. This code gate keeps teacher information out of the normal student view; it is not secure authentication, and source inspection can reveal answers.</p></div>
+    <button class="secondary" onclick="openTeacherRoom()">Lock teacher room</button>`;
+  el('teacherInfo').classList.remove('hidden');el('teacherInfo').focus();
+}
 
 // PASTE YOUR GOOGLE FORM /viewform LINK BELOW. Do not use the /edit link.
 const GOOGLE_FORM_URL='';
