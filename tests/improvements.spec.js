@@ -1,6 +1,7 @@
 const {test,expect}=require('@playwright/test');
 const {skipCutscene}=require('./cutscene-helper');
 const {investigateRoom}=require('./exploration-helper');
+const {catchFirefly}=require('./interlude-helper');
 async function begin(page){await page.goto('/');await page.locator('#enterBtn').click();await skipCutscene(page);}
 async function choose(page,group,value){await page.locator(`[data-group="${group}"] .option`).filter({hasText:new RegExp('^'+value+' ')}).click();}
 async function solveClock(page){await investigateRoom(page);await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);}
@@ -28,18 +29,22 @@ test('two distinct arcade breaks appear between rooms, save progress, and cost n
   await expect(page.locator('#interlude')).toBeVisible();await expect(page.locator('#breakTitle')).toHaveText('The lantern alcove');
   const lives=await page.locator('#lives').textContent();
   for(const i of [0,2])await page.locator('.lantern-card').nth(i).click();
-  await expect(page.locator('#breakStatus')).toContainText('1 / 3');
+  await expect(page.locator('#breakStatus')).toContainText('1 / 6');
   await page.reload();await page.locator('#enterBtn').click();
   await expect(page.locator('#interlude')).toBeVisible();await expect(page.locator('.lantern-card:disabled')).toHaveCount(2);
-  for(const i of [1,4,3,5])await page.locator('.lantern-card').nth(i).click();
+  const cards=await page.evaluate(()=>Interludes.snapshot().cards);
+  for(let value=0;value<6;value++){
+    if(value===cards[0])continue;
+    for(let i=0;i<cards.length;i++)if(cards[i]===value)await page.locator('.lantern-card').nth(i).click();
+  }
   await expect(page.locator('#breakContinue')).toBeEnabled();await page.locator('#breakContinue').click();
   await expect(page.locator('#title')).toContainText('Gallery');
   await investigateRoom(page);await choose(page,'fact','B');await choose(page,'headline','B');await page.locator('#checkBtn').click();await skipCutscene(page);
   await investigateRoom(page);await choose(page,'step','B');await choose(page,'upgrade','C');await page.locator('#checkBtn').click();await skipCutscene(page);
   await expect(page.locator('#interlude')).toBeVisible();await expect(page.locator('#breakTitle')).toHaveText('The firefly corridor');
-  await page.locator('#firefly').press('Enter');await page.locator('#firefly').press('Enter');
+  await catchFirefly(page);await catchFirefly(page);
   await page.reload();await page.locator('#enterBtn').click();await expect(page.locator('#breakStatus')).toContainText('2 / 5');
-  for(let i=0;i<3;i++)await page.locator('#firefly').press('Enter');
+  for(let i=0;i<3;i++)await catchFirefly(page);
   await page.locator('#breakContinue').click();await expect(page.locator('#title')).toContainText('Poet');
   await expect(page.locator('#lives')).toHaveText(lives);
   expect(await page.evaluate(()=>Interludes.snapshot().completed)).toEqual([2,4]);

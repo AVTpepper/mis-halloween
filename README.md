@@ -6,7 +6,7 @@ Student-controlled cutscenes introduce the museum, connect each solved room to t
 
 Glowing outlines and an on-screen instruction identify objects to click or tap. Each discovery opens the Clues panel in the information sidebar (a drawer on phones). The notebook keeps every collected clue across rooms and refreshes. Choose a room and an item to reread its clue without leaving the current activity. There are no video players, media downloads or loading screens. The countdown continues while investigating; students cannot pause the team countdown. The illustrated room transitions are rendered locally with HTML/CSS/SVG.
 
-Two optional arcade breaks add variety between rooms: match three lantern pairs after the potion room, then catch five fireflies after the robot workshop. Both support mouse, touch and keyboard, save progress across refreshes, and can be skipped. They do not award digits or cost lives. The two-player Snake cabinet remains the final room.
+Two optional arcade breaks add variety between rooms: match six lantern pairs (12 cards) after the potion room, then catch five fireflies after the robot workshop. A flashlight wanders randomly through the dark corridor; only bugs fully inside its beam can be caught. Aim with a mouse or touch, or Tab to the corridor and use arrows / WASD to aim and Enter / Space to catch. Reduced-motion settings keep the beam still for manual aiming. Both breaks save progress across refreshes and can be skipped. They do not award digits or cost lives. Older six-card saves retain their matches and gain three new pairs. The two-player Snake cabinet remains the final room.
 
 ## Classroom planning
 
@@ -41,7 +41,9 @@ Teams start with **five shared lives**. Every incorrect Check the lock submissio
 
 Snake is the sixth challenge, preserving all five curriculum rooms. Two teammates take **sequential turns on the same device**. Player 1 must clear 10 levels, then Player 2 must clear 10. One gold spark clears one short level; the snake grows and gradually speeds up. Walls and the snake’s body are hazards. A crash costs a team life and resets the active player’s run to zero; an already completed Player 1 turn is retained until the whole team loses its last life. Both players must reach 10/10 before the lock button enables and digit 7 can be earned.
 
-Use arrow keys, WASD, or the on-screen direction buttons. Start/resume the turn explicitly. Space pauses while the board has focus; the Pause turn button works at any time. Navigating away, hiding the tab, or refreshing safely pauses only the snake. The team countdown continues even when the snake is paused. Refresh restores its board, each player's cleared levels and shared lives; it never starts moving automatically. The team countdown continues as described above. The updated rules use a new save version, so older five-room saves begin a fresh attempt.
+Use arrow keys, WASD (including uppercase), or the on-screen direction buttons. Start/resume the turn explicitly. Snake renders at the display refresh rate, interpolating between grid moves while keeping the existing difficulty; reduced-motion settings use discrete movement. Space pauses while the board has focus; the Pause turn button works at any time. Navigating away, hiding the tab, or refreshing safely pauses only the snake. The team countdown continues even when the snake is paused. Refresh restores its board, each player's cleared levels and shared lives; it never starts moving automatically. The team countdown continues as described above. The updated rules use a new save version, so older five-room saves begin a fresh attempt.
+
+Press Enter in a typed lock-answer field to check the lock, just as with the Check the lock button. Working fields for multiples remain available for notes without submitting. Teacher access and the final rescue code also support Enter.
 
 ## Curriculum connections and teacher answer key
 

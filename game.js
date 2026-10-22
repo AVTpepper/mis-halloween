@@ -95,6 +95,7 @@ function show(section) {
   MuseumAudio.setSceneActive(['game','interlude'].includes(section));
   if(section!=='teacher')lockTeacherRoom();
   ['home','game','interlude','final','win','vote','teacher'].forEach(x=>el(x).classList.toggle('hidden',x!==section));
+  Interludes.setActive(section==='interlude');
   renderNotebook();renderPreferences();
   window.scrollTo({top:0,behavior:'instant'});
   el('main').focus({preventScroll:true});
@@ -142,6 +143,13 @@ function render() {
     board.querySelectorAll('.jar').forEach((b,i)=>paintJar(b,i)); updateJars();
   }
   el('challenge').querySelectorAll('input').forEach(input=>{ input.value=answers[input.id] || ''; input.addEventListener('input',()=>{answers[input.id]=input.value;save();}); });
+  el('challenge').querySelectorAll('input[id^="value"]').forEach(input=>{
+    input.setAttribute('enterkeyhint','send');
+    input.addEventListener('keydown',event=>{
+      if(event.key!=='Enter'||event.isComposing||event.repeat||document.querySelector('dialog[open]')||el('checkBtn').disabled||!el('checkBtn').checkVisibility())return;
+      event.preventDefault();checkAnswer();
+    });
+  });
   el('challenge').querySelectorAll('.option').forEach(button=>{
     button.setAttribute('aria-pressed','false');
     const match=button.getAttribute('onclick').match(/choose\('([^']+)','([^']+)'/);
@@ -339,4 +347,4 @@ function unlockTeacherRoom(event) {
 
 // PASTE YOUR GOOGLE FORM /viewform LINK BELOW. Do not use the /edit link.
 const GOOGLE_FORM_URL='';
-function mountForm(){if(!GOOGLE_FORM_URL)return;let url;try{url=new URL(GOOGLE_FORM_URL);if(url.protocol!=='https:'||!(url.hostname==='docs.google.com'||url.hostname==='forms.gle'))return}catch{return}const shell=el('formShell');shell.innerHTML='';if(url.hostname==='docs.google.com'&&url.pathname.includes('/forms/')&&url.pathname.includes('/viewform')){const iframe=document.createElement('iframe');iframe.title='PYP 6 costume awards Google Form';url.searchParams.set('embedded','true');iframe.src=url.toString();iframe.loading='lazy';shell.append(iframe)}else{let p=document.createElement('p');p.textContent='Use the button below to open costume voting.';shell.append(p)}let a=document.createElement('a');a.href=GOOGLE_FORM_URL;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open the voting form in a new tab ↗';a.style.color='#ffbb6d';shell.append(a)}document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target?.id==='finalCode')unlock()});restore();mountForm();updateClock();renderPreferences();renderNotebook();if(started)timer=setInterval(tick,1000);
+function mountForm(){if(!GOOGLE_FORM_URL)return;let url;try{url=new URL(GOOGLE_FORM_URL);if(url.protocol!=='https:'||!(url.hostname==='docs.google.com'||url.hostname==='forms.gle'))return}catch{return}const shell=el('formShell');shell.innerHTML='';if(url.hostname==='docs.google.com'&&url.pathname.includes('/forms/')&&url.pathname.includes('/viewform')){const iframe=document.createElement('iframe');iframe.title='PYP 6 costume awards Google Form';url.searchParams.set('embedded','true');iframe.src=url.toString();iframe.loading='lazy';shell.append(iframe)}else{let p=document.createElement('p');p.textContent='Use the button below to open costume voting.';shell.append(p)}let a=document.createElement('a');a.href=GOOGLE_FORM_URL;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open the voting form in a new tab ↗';a.style.color='#ffbb6d';shell.append(a)}document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing&&!e.repeat&&e.target?.id==='finalCode'&&e.target.checkVisibility()&&!document.querySelector('dialog[open]')){e.preventDefault();unlock()}});restore();mountForm();updateClock();renderPreferences();renderNotebook();if(started)timer=setInterval(tick,1000);
