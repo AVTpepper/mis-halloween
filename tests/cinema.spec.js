@@ -13,7 +13,7 @@ test('cutscenes stay open until Continue while the countdown keeps running',asyn
   await skipCutscene(page);await expect(page.locator('#cutscene')).not.toBeVisible();
   await page.clock.runFor(1000);await expect(page.locator('#clock')).toHaveText('19:55');
   await investigateRoom(page);
-  await page.locator('#activityNext').click();await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();
+  await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();
   await expect(page.locator('#cutsceneChapter')).toHaveText('Room 1 cleared · digit 6 recovered');
   await page.clock.runFor(30000);await expect(page.locator('#cutscene')).toBeVisible();
   await expect(page.locator('#clock')).toHaveText('19:25');

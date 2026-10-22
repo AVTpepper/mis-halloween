@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 http.createServer((req,res)=>{
-  const files = {'/':'index.html','/index.html':'index.html','/game.js':'game.js','/exploration.js':'exploration.js','/snake.js':'snake.js','/cutscenes.js':'cutscenes.js','/styles.css':'styles.css'};
+  const files = {'/':'index.html','/index.html':'index.html','/audio.js':'audio.js','/interludes.js':'interludes.js','/game.js':'game.js','/exploration.js':'exploration.js','/snake.js':'snake.js','/cutscenes.js':'cutscenes.js','/styles.css':'styles.css'};
   const pathname=req.url?.split('?')[0];
   const file = files[pathname];
   if(!file) {res.writeHead(404);return res.end();}

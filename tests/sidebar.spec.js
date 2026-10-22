@@ -12,6 +12,7 @@ test('sidebar contains information and leaves the activity most of the screen',a
     const box=await page.locator(selector).boundingBox();expect(box.y).toBeGreaterThanOrEqual(sidebar.y);expect(box.y+box.height).toBeLessThanOrEqual(sidebar.y+sidebar.height);
   }
   await page.screenshot({path:'artifacts/sidebar-desktop.png'});
+  if(await page.locator('#infoTab').isVisible())await page.locator('#infoTab').click();
   await page.getByRole('button',{name:'Home',exact:true}).click();
   await expect(page.locator('#gameSidebar')).not.toBeVisible();
   await expect(page.locator('.wrap>.top')).toBeVisible();
@@ -25,7 +26,6 @@ test('mobile information drawer keeps progress, counts down, and closes with Esc
   await expect(page.locator('#gameSidebar')).not.toBeVisible();
   await expect(page.locator('#mobileClock')).toHaveText('20:00');
   await page.locator('.object').first().click();
-  await page.locator('#sidebarToggle').click();
   await expect(page.locator('#gameSidebar')).toBeVisible();
   await expect(page.locator('#main')).toHaveAttribute('inert','');
   await page.clock.runFor(2000);await expect(page.locator('#mobileClock')).toHaveText('19:58');
@@ -36,7 +36,7 @@ test('mobile information drawer keeps progress, counts down, and closes with Esc
   await expect(page.locator('#main')).not.toHaveAttribute('inert','');
   await expect(page.locator('#objectClue')).toContainText('brass clock');
   await page.screenshot({path:'artifacts/sidebar-mobile-activity.png'});
-  await page.locator('#sidebarToggle').click();
+  await page.locator('#sidebarToggle').click();await page.locator('#infoTab').click();
   await page.getByRole('button',{name:'Home',exact:true}).click();
   await page.locator('#enterBtn').click();
   await expect(page.locator('.object.found')).toHaveCount(1);

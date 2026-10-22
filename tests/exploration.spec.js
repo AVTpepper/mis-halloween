@@ -38,12 +38,12 @@ test('hidden compartments require experimentation and collected clues survive re
   await page.setViewportSize({width:375,height:812});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.locator('.room-scene').screenshot({path:'artifacts/exploration-clock-mobile.png'});
-  await collectVisible(page);await page.locator('#activityNext').click();await page.locator('#activityNext').click();await expect(page.locator('#checkBtn')).toBeEnabled();
+  await collectVisible(page);await page.locator('#activityNext').click();await expect(page.locator('#checkBtn')).toBeEnabled();
   await expect(page.locator('#lives')).toHaveText('5 / 5 lives');
 });
 test('mixing experiments are free and persist without revealing the lock early',async({page})=>{
   await page.goto('/');await page.locator('#enterBtn').click();await skipCutscene(page);
-  await investigateRoom(page);await page.locator('#activityNext').click();await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
+  await investigateRoom(page);await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
   await expect(page.locator('.object').first()).not.toBeVisible();
   await collectVisible(page);await page.locator('#activityNext').click();
   await page.getByRole('button',{name:/^Add orange drop/}).click();

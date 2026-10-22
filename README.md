@@ -1,10 +1,12 @@
 # The Midnight Museum — Classroom Edition
 
-A static, Chromebook-friendly Halloween escape room. Teams investigate six rooms, collect six digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the six website files on GitHub Pages.
+A static, Chromebook-friendly Halloween escape room. Teams investigate six rooms, collect six digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the eight website files on GitHub Pages.
 
 Student-controlled cutscenes introduce the museum, connect each solved room to the next, reveal recovered digits, and celebrate Pip’s rescue. Animated doors, glowing relics, floating Pip, stars and mist set the scene. Each modal stays open until the student activates Continue; it does not close automatically or with Escape or a backdrop click. Keyboard users can activate the Continue button with Enter or Space; the team countdown keeps running during every scene. Reduced-motion preferences disable movement. Refreshing or closing the tab does not pause the countdown; reopening calculates the time left from the saved deadline.
 
-Clicking an illustrated object reveals its clue beside the room scene, or below it on narrow screens. Discovered clues can be read again by clicking the object. There are no video players, media downloads or loading screens. The countdown continues while investigating; students cannot pause the team countdown. The illustrated room transitions are rendered locally with HTML/CSS/SVG.
+Glowing outlines and an on-screen instruction identify objects to click or tap. Each discovery opens the Clues panel in the information sidebar (a drawer on phones). The notebook keeps every collected clue across rooms and refreshes. Choose a room and an item to reread its clue without leaving the current activity. There are no video players, media downloads or loading screens. The countdown continues while investigating; students cannot pause the team countdown. The illustrated room transitions are rendered locally with HTML/CSS/SVG.
+
+Two optional arcade breaks add variety between rooms: match three lantern pairs after the potion room, then catch five fireflies after the robot workshop. Both support mouse, touch and keyboard, save progress across refreshes, and can be skipped. They do not award digits or cost lives. The two-player Snake cabinet remains the final room.
 
 ## Classroom planning
 
@@ -12,7 +14,7 @@ Allow 5 minutes to introduce Pip and form teams, 20 minutes to escape, 10 minute
 
 Each room is an illustrated scene with keyboard/touch-accessible objects, a sealed compartment and a mechanism to investigate. Working the mechanism reveals a hidden note. Collect all three clues and complete the mechanism to reveal the lock challenge. Clicking a discovered object shows its clue again; use Back to revisit earlier activities and reread their objects. Potion jars can then be toggled to model three-fourths of 12; the team still enters its own numerical answer. Hints and retry feedback support discussion.
 
-Rooms show one activity at a time: search the available objects, try the mechanism, read the hidden clues, then solve the lock. Continue unlocks after the search or mechanism is complete, allowing time to read the latest clue before moving on. Longer locks are split into two parts; Back keeps all answers and discoveries. The current activity is saved across refreshes. Desktop activities fill the screen beside an information sidebar containing navigation, lives, timer, room progress, collected code and restart controls. On narrow screens, Museum info opens this sidebar as a drawer; timer and lives remain visible above the activity. Opening the drawer pauses Snake while the museum countdown continues. Activities use no nested scrollbars; narrow screens use normal page scrolling when needed.
+Rooms show one activity at a time: search the available objects, try the mechanism, read the hidden clues, then solve the lock. Continue unlocks after the search or mechanism is complete, allowing time to read the latest clue before moving on. Related questions, evidence and working fields stay visible together in the lock activity; Back keeps all answers and discoveries. The current activity is saved across refreshes. Desktop activities fill the screen beside an information sidebar containing navigation, lives, timer, room progress, collected code and restart controls. On narrow screens, Museum info opens this sidebar as a drawer; timer and lives remain visible above the activity. Opening the drawer pauses Snake while the museum countdown continues. The Info tab includes a countdown visibility toggle and separate sound/music controls. Audio starts off and is generated locally with Web Audio after a student opts in. Music is quiet ambient tones; clue, clock and lock events have optional sound cues. Audio stops when the tab is hidden. Hiding the countdown does not pause it or change the rescue rules. Activities use no nested scrollbars; narrow screens use normal page scrolling when needed.
 
 ## Exploring the rooms
 
@@ -27,7 +29,7 @@ Experiments are free to retry; only incorrect lock submissions, wrong final code
 | Poet’s study | Move five torn strips into their Roman-numeral stamp order I–V | The restored page behind the portrait, ready for reading its first letters |
 | Serpent arcade | Activate both player power switches | The cabinet and service card, followed by the two-player, ten-level Snake challenge |
 
-In the clock illustration, the short hour hand stays at 12 and only the long minute hand turns with the slider. The lock challenge provides two blank multiples fields for students’ own working; no completed lists are supplied. Entries are saved across refreshes and cleared when a new team starts. The final numerical answer is checked as before.
+In the clock illustration, the short hour hand stays at 12. Each minute hand marks its last chime: brass jumps at multiples of 9 minutes and silver at multiples of 12. The time slider still advances minute by minute, and a label explains the stepped hands. The lock challenge provides two blank multiples fields for students’ own working; no completed lists are supplied. Entries are saved across refreshes and cleared when a new team starts. The final numerical answer is checked as before.
 
 Current saves keep previously earned room digits. A room that was in progress before the exploratory update starts with its new mechanism unsolved while retaining collected clues. All six walkthroughs are also inside the code-gated Teacher room.
 
@@ -68,7 +70,7 @@ Repository: https://github.com/AVTpepper/mis-halloween
 2. Push to `main`, or run **Deploy classroom website** manually in the Actions tab.
 3. Check the workflow’s deployment link. The expected URL is `https://avtpepper.github.io/mis-halloween/`.
 
-The workflow publishes `index.html`, `styles.css`, `game.js`, `snake.js`, `cutscenes.js`, `exploration.js`. All asset paths are relative so the repository subpath works. Alternatively, select **Deploy from a branch → main → /(root)**; the same files work directly without a build. Use one deployment method.
+The workflow publishes `index.html`, `styles.css`, `game.js`, `snake.js`, `cutscenes.js`, `exploration.js`, `audio.js`, `interludes.js`. All asset paths are relative so the repository subpath works. Alternatively, select **Deploy from a branch → main → /(root)**; the same files work directly without a build. Use one deployment method.
 
 ## Google Forms costume voting
 
@@ -82,8 +84,8 @@ Until a form is supplied, students see a friendly waiting message. Voting is hos
 
 ## Editing, verification and ZIP
 
-`game.js` contains puzzle content (`rooms`), inspectable clues (`objects`), game flow and the form setting. `exploration.js` contains illustrated props, room mechanisms, hidden-compartment rules and saved scene state. `snake.js` contains the arcade rules, controls, drawing and saved board. Edit appearance in `styles.css` and page structure in `index.html`.
+`game.js` contains puzzle content (`rooms`), inspectable clues (`objects`), game flow and the form setting. `exploration.js` contains illustrated props, room mechanisms, hidden-compartment rules and saved scene state. `snake.js` contains the arcade rules, controls, drawing and saved board. `interludes.js` implements the optional lantern and firefly breaks; `audio.js` implements the opt-in audio preferences and tones. Edit appearance in `styles.css` and page structure in `index.html`.
 
 For browser checks, install Node.js and Microsoft Edge, then run `npm ci` followed by `npm test`. Playwright launches Edge against a local static server and covers the complete six-room rescue, both 10-level Snake turns through actual controls, a crash and retained teammate progress, life loss at puzzle and final locks, zero-life reset, refresh recovery, jar model, pause, timeout, restart, mobile overflow and form embedding. Development dependencies are unnecessary for classroom use.
 
-On Windows, run `powershell -File scripts/package.ps1` to create `artifacts/midnight-museum-classroom.zip`. It contains the six website files and this teacher guide. Extract all files together and open `index.html`. The generated ZIP is ignored by Git; source files and the packaging script are tracked.
+On Windows, run `powershell -File scripts/package.ps1` to create `artifacts/midnight-museum-classroom.zip`. It contains the eight website files and this teacher guide. Extract all files together and open `index.html`. The generated ZIP is ignored by Git; source files and the packaging script are tracked.

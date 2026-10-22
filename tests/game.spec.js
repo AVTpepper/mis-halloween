@@ -18,7 +18,7 @@ test('team explores every room, recovers progress, and rescues Pip',async({page}
   await page.getByRole('button',{name:'Escape room',exact:true}).click();await skipCutscene(page);
   await expect(page.locator('#title')).toHaveText('The Clockmaker’s Secret');
   await expect(page.locator('#checkBtn')).toBeDisabled();
-  await inspect(page);await page.locator('#activityNext').click();await page.locator('#value1').fill('12');await page.locator('#checkBtn').click();await skipCutscene(page);
+  await inspect(page);await page.locator('#value1').fill('12');await page.locator('#checkBtn').click();await skipCutscene(page);
   await expect(page.locator('#feedback')).toContainText('lock stays closed');
   await expect(page.locator('.lock-effect')).toHaveAttribute('data-outcome','failure');
   await page.clock.runFor(250);
@@ -26,15 +26,15 @@ test('team explores every room, recovers progress, and rescues Pip',async({page}
   await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
   await page.clock.runFor(500);
   await page.screenshot({path:'artifacts/lock-success.png'});
-  await inspect(page);await page.locator('#value2a').fill('8');await page.locator('#activityNext').click();
+  await inspect(page);await page.locator('#value2a').fill('8');
   for(let i=0;i<9;i++)await page.locator('.jar').nth(i).click();
   await expect(page.locator('#jarCount')).toContainText('9 of 12');
   await page.reload();await page.locator('#enterBtn').click();await skipCutscene(page);
-  await page.locator('#activityBack').click();await expect(page.locator('#value2a')).toHaveValue('8');await page.locator('#activityNext').click();await expect(page.locator('.jar.filled')).toHaveCount(9);
+  await expect(page.locator('#value2a')).toHaveValue('8');await expect(page.locator('.jar.filled')).toHaveCount(9);
   await page.locator('#value2b').fill('9');await page.locator('#checkBtn').click();await skipCutscene(page);
-  await inspect(page);await choice(page,'fact','B');await page.locator('#activityNext').click();await choice(page,'headline','B');await page.locator('#checkBtn').click();await skipCutscene(page);
-  await inspect(page);await choice(page,'step','B');await page.locator('#activityNext').click();await choice(page,'upgrade','C');await page.locator('#checkBtn').click();await skipCutscene(page);
-  await inspect(page);await choice(page,'claim','B');await page.locator('#activityNext').click();await page.locator('#value5').fill('check');await page.locator('#checkBtn').click();await skipCutscene(page);
+  await inspect(page);await choice(page,'fact','B');await choice(page,'headline','B');await page.locator('#checkBtn').click();await skipCutscene(page);
+  await inspect(page);await choice(page,'step','B');await choice(page,'upgrade','C');await page.locator('#checkBtn').click();await skipCutscene(page);
+  await inspect(page);await choice(page,'claim','B');await page.locator('#value5').fill('check');await page.locator('#checkBtn').click();await skipCutscene(page);
   await expect(page.locator('#title')).toHaveText('The Serpent Arcade');
   await inspect(page);await expect(page.locator('#checkBtn')).toBeDisabled();
   await page.setViewportSize({width:375,height:812});
@@ -73,7 +73,7 @@ test('team explores every room, recovers progress, and rescues Pip',async({page}
 test('cutscenes respect reduced motion and can be skipped for the next puzzle',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.goto('/');await page.locator('#enterBtn').click();await skipCutscene(page);
-  await inspect(page);await page.locator('#activityNext').click();await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
+  await inspect(page);await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
   expect(await page.locator('.portal-door').first().evaluate(e=>getComputedStyle(e).display)).toBe('none');
   expect(await page.locator('#cutsceneTitle').evaluate(e=>getComputedStyle(e).animationName)).toBe('none');
   await inspect(page);await page.locator('#value2a').fill('8');
@@ -82,9 +82,9 @@ test('cutscenes respect reduced motion and can be skipped for the next puzzle',a
 });
 test('last team life resets all earned progress and persists the fresh game',async({page})=>{
   await page.goto('/');await page.locator('#enterBtn').click();await skipCutscene(page);
-  await inspect(page);await page.locator('#activityNext').click();await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
+  await inspect(page);await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
   await inspect(page);
-  await page.locator('#value2a').fill('1');await page.locator('#activityNext').click();await page.locator('#value2b').fill('1');
+  await page.locator('#value2a').fill('1');await page.locator('#value2b').fill('1');
   for(let remaining=4;remaining>=1;remaining--) {
     await page.locator('#checkBtn').click();await skipCutscene(page);await expect(page.locator('#lives')).toHaveText(`${remaining} / 5 lives`);
   }
@@ -110,7 +110,7 @@ test('continuous timer, refresh, timeout, restart and mobile layout',async({page
   await page.reload();await page.clock.fastForward(60000);await page.locator('#enterBtn').click();await skipCutscene(page);await expect(page.locator('#clock')).toHaveText('17:55');
   await page.clock.fastForward(1200000);await expect(page.locator('#clock')).toHaveText('00:00');
   await expect(page.locator('#pauseBtn')).toHaveCount(0);
-  await inspect(page);await page.locator('#activityNext').click();await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
+  await inspect(page);await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
   await expect(page.locator('#title')).toContainText('Potion');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.locator('#sidebarToggle').click();page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'Start a new team game'}).click();await expect(page.locator('#title')).toContainText('Potion');

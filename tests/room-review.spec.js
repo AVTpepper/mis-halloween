@@ -27,9 +27,10 @@ for(const viewport of [{width:1024,height:600},{width:375,height:812}])test(`rev
     await page.locator('#activityNext').click();await collectVisible(page);await inspectStage(room,'hidden');
     await page.locator('#activityNext').click();await inspectStage(room,'lock-a');
     if(room!==5){
-      await page.locator('#activityNext').click();await inspectStage(room,'lock-b');
-      if(room===2)await expect(page.locator('.question-reference')).toContainText('No recording shows who caused it');
-      if(room===3)await expect(page.locator('.question-reference')).toContainText('4 Improve');
+      await expect(page.locator('.lock-question')).toHaveCount(2);
+      for(const question of await page.locator('.lock-question').all())await expect(question).toBeVisible();
+      if(room===2)await expect(page.locator('.lock-context')).toContainText('No recording shows anyone');
+      if(room===3)await expect(page.locator('.lock-context')).toContainText('4 Improve');
     }
   }
 });

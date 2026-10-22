@@ -3,7 +3,7 @@ async function collectVisible(page){
   const count=await page.locator('.object').count();
   for(let i=0;i<count;i++){
     const object=page.locator('.object').nth(i);
-    if(await object.isVisible()&&!(await object.getAttribute('class')).includes('found')){await object.click();await skipCutscene(page);}
+    if(await object.isVisible()&&!(await object.getAttribute('class')).includes('found')){await object.click();await skipCutscene(page);if(await page.locator('body').evaluate(e=>e.classList.contains('sidebar-open')))await page.locator('#sidebarClose').click();}
   }
 }
 async function solveMechanism(page){
@@ -18,6 +18,7 @@ async function solveMechanism(page){
   if(room===5){for(let i=0;i<2;i++)await page.getByRole('button',{name:`Player ${i+1} power · OFF`,exact:true}).click();}
 }
 async function investigateRoom(page){
+  if(await page.locator('#interlude').isVisible())await page.locator('#breakSkip').click();
   if((await page.locator('#activityTitle').textContent()).startsWith('4 /'))return;
   await collectVisible(page);await solveMechanism(page);
   await page.locator('#activityNext').click();

@@ -23,6 +23,15 @@ test('multiples begin blank and retain only the students own working after refre
   await page.reload();await page.locator('#enterBtn').click();
   await expect(page.locator('#clockMultiplesA')).toHaveValue('9, 18, 27, 36');
   await expect(page.locator('#clockMultiplesB')).toHaveValue('12, 24, 36');
-  await page.locator('#activityNext').click();await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
+  await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
   await expect(page.locator('#title')).toHaveText('The Potion of Proportions');
+});
+
+test('each clock hand jumps only at its own chime interval',async({page})=>{
+  await page.goto('/');await page.locator('#enterBtn').click();await skipCutscene(page);await collectVisible(page);await page.locator('#activityNext').click();
+  for(const [minute,brass,silver] of [[8,0,0],[9,54,0],[11,54,0],[12,54,72],[18,108,72],[24,108,144],[36,216,216]]){
+    await page.locator('#sceneMinute').fill(String(minute));
+    await expect(page.locator('.mechanism-clocks .minute-hand').nth(0)).toHaveAttribute('transform',`rotate(${brass} 60 57)`);
+    await expect(page.locator('.mechanism-clocks .minute-hand').nth(1)).toHaveAttribute('transform',`rotate(${silver} 60 57)`);
+  }
 });
