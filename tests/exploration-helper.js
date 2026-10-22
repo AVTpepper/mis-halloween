@@ -7,6 +7,7 @@ async function collectVisible(page){
   }
 }
 async function solveMechanism(page){
+  if((await page.locator('#activityTitle').textContent()).startsWith('1 /'))await page.locator('#activityNext').click();
   if(await page.locator('.scene-discovery').isVisible())return;
   const room=Number((await page.locator('#roomNo').textContent()).match(/\d+/)[0])-1;
   if(room===0){await page.locator('#sceneMinute').focus();await page.locator('#sceneMinute').press('End');for(let i=0;i<12;i++)await page.locator('#sceneMinute').press('ArrowLeft');}
@@ -16,5 +17,10 @@ async function solveMechanism(page){
   if(room===4){for(const [target,mark] of ['I','II','III','IV','V'].entries()){const up=page.getByRole('button',{name:`Move strip ${mark} up`,exact:true});while(await up.evaluate(b=>Array.from(b.closest('ol').children).indexOf(b.closest('li')))>target)await up.click();}}
   if(room===5){for(let i=0;i<2;i++)await page.getByRole('button',{name:`Player ${i+1} power · OFF`,exact:true}).click();}
 }
-async function investigateRoom(page){await collectVisible(page);await solveMechanism(page);await collectVisible(page);}
+async function investigateRoom(page){
+  if((await page.locator('#activityTitle').textContent()).startsWith('4 /'))return;
+  await collectVisible(page);await solveMechanism(page);
+  await page.locator('#activityNext').click();
+  await collectVisible(page);await page.locator('#activityNext').click();
+}
 module.exports={investigateRoom,solveMechanism,collectVisible};

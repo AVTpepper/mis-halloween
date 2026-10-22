@@ -13,8 +13,6 @@ test('clickable room items reveal readable clues directly without loading videos
   expect(await page.locator('#clock').textContent()).not.toBe(before);
   await page.locator('.object').nth(1).click();
   await expect(page.locator('#objectClue')).toContainText('every 12 minutes');
-  await expect(page.locator('.cluebook')).toContainText('every 9 minutes');
-  await expect(page.locator('.cluebook')).toContainText('every 12 minutes');
   await page.locator('.object').first().click();
   await expect(page.locator('#objectClue')).toContainText('every 9 minutes');
   await expect(page.locator('#lives')).toHaveText('5 / 5 lives');

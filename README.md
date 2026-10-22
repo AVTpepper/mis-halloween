@@ -4,13 +4,15 @@ A static, Chromebook-friendly Halloween escape room. Teams investigate six rooms
 
 Student-controlled cutscenes introduce the museum, connect each solved room to the next, reveal recovered digits, and celebrate Pip’s rescue. Animated doors, glowing relics, floating Pip, stars and mist set the scene. Each modal stays open until the student activates Continue; it does not close automatically or with Escape or a backdrop click. Keyboard users can activate the Continue button with Enter or Space; the team countdown keeps running during every scene. Reduced-motion preferences disable movement. Refreshing or closing the tab does not pause the countdown; reopening calculates the time left from the saved deadline.
 
-Clicking an illustrated object reveals its clue directly beneath the room scene. Discovered clues stay in the notebook and can be read again by clicking the object. There are no video players, media downloads or loading screens. The countdown continues while investigating; students cannot pause the team countdown. The illustrated room transitions are rendered locally with HTML/CSS/SVG.
+Clicking an illustrated object reveals its clue beside the room scene, or below it on narrow screens. Discovered clues can be read again by clicking the object. There are no video players, media downloads or loading screens. The countdown continues while investigating; students cannot pause the team countdown. The illustrated room transitions are rendered locally with HTML/CSS/SVG.
 
 ## Classroom planning
 
 Allow 5 minutes to introduce Pip and form teams, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for 2–3 minutes per curriculum room and reserve roughly 4–5 minutes for the two arcade turns and final code. Timing depends on players’ Snake experience; introduce the controls before teams begin. The countdown begins when a team enters the museum and continues through the final door. There is no countdown Pause/Resume control. Reaching zero permits teams to continue solving.
 
-Each room is an illustrated scene with keyboard/touch-accessible objects, a sealed compartment and a mechanism to investigate. Working the mechanism reveals a hidden note. Collect all three clues and complete the mechanism to reveal the lock challenge. Clicking a discovered object shows its clue again; clues also remain in the notebook. Potion jars can then be toggled to model three-fourths of 12; the team still enters its own numerical answer. Hints and retry feedback support discussion.
+Each room is an illustrated scene with keyboard/touch-accessible objects, a sealed compartment and a mechanism to investigate. Working the mechanism reveals a hidden note. Collect all three clues and complete the mechanism to reveal the lock challenge. Clicking a discovered object shows its clue again; use Back to revisit earlier activities and reread their objects. Potion jars can then be toggled to model three-fourths of 12; the team still enters its own numerical answer. Hints and retry feedback support discussion.
+
+Rooms show one activity at a time: search the available objects, try the mechanism, read the hidden clues, then solve the lock. Continue unlocks after the search or mechanism is complete, allowing time to read the latest clue before moving on. Longer locks are split into two parts; Back keeps all answers and discoveries. The current activity is saved across refreshes. Desktop activities fit the viewport without nested scrollbars; narrow screens use normal page scrolling when needed.
 
 ## Exploring the rooms
 
