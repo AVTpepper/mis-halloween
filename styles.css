@@ -304,3 +304,110 @@ body.playing .game-sidebar .footer p{display:block;font-size:.65rem;line-height:
  body.playing .room{min-height:calc(100dvh - 58px);align-content:start}
  body.playing .game-sidebar .footer p{display:block}
 }
+/* Discovery, notebook and shared questions keep the activity self-contained. */
+#sidebarTop,#sidebarBottom{min-width:0}
+body.playing #sidebarBottom{margin-top:auto}
+.sidebar-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sidebar-tabs button[aria-pressed=true]{background:#574266;border-color:var(--accent);color:var(--accent)}
+#clueCount{display:inline-grid;place-items:center;min-width:18px;border-radius:12px;background:#1a1329;margin-left:3px;font-size:.7rem}
+.sidebar-pane{min-width:0;display:flex;flex-direction:column;gap:10px}
+.preferences{display:grid;gap:5px;border-top:1px solid #665477;padding-top:8px}
+.preferences .mini{font-size:.65rem;padding:5px;min-height:28px}
+.preferences small{font-size:.62rem;line-height:1.35;color:var(--muted)}
+.audio-controls{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+body.playing .game-sidebar .footer{margin:0}
+body.playing #sidebarInfo>.row{display:block;border-top:1px solid #665477;padding-top:6px;font-size:.8rem}
+#sidebarClues h3{margin:0;color:var(--good);font-size:1rem}
+.journal-label{font-size:.7rem;color:var(--muted)}
+#journalRoom{width:100%;min-width:0;background:#21172e;color:var(--text);border:1px solid #806a91;border-radius:8px;padding:7px;font:inherit;font-size:.72rem}
+.clue-chips{display:grid;gap:5px}
+.clue-chips .mini{font-size:.7rem;padding:6px;text-align:left;line-height:1.3}
+.clue-chips .selected{border-color:var(--good);background:#23443b;color:var(--good)}
+body.playing #sidebarClues .object-clue{padding:10px;border-width:0 0 0 3px;border-radius:0 8px 8px 0}
+body.playing #sidebarClues .object-clue h3{font-size:.85rem}
+body.playing #sidebarClues .object-clue p{font-size:.85rem;line-height:1.45}
+body.playing #sidebarClues .object-clue .tag{display:none}
+body.playing #exploration{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);align-items:stretch;gap:10px}
+.search-instruction{margin:0;font-size:.9rem;color:var(--text);border-left:3px solid var(--accent);padding:8px 12px;background:#44304f;border-radius:0 8px 8px 0}
+.search-instruction span{display:block;font-size:.8rem;color:var(--muted)}
+body.playing .room-scene .scene-object{border:2px solid #d6a76a;border-radius:16px;background:#291c36b3!important;box-shadow:0 0 22px #ffbb6d33;max-width:190px;padding:10px;gap:6px}
+body.playing .room-scene .scene-object.found{border-color:var(--good);background:#1b302cb3!important;box-shadow:none}
+body.playing .room-scene .scene-object>span{font-size:.85rem;background:transparent;padding:3px}
+body.playing .room-scene .scene-object small{display:block;font-size:.65rem;color:var(--accent);padding:3px 5px}
+body.playing .room-scene .scene-object.found small{color:var(--good)}
+body.playing .room-scene .scene-object:focus-visible{outline-offset:4px}
+body.playing #challenge>.questions-together{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto;gap:16px;align-content:center;align-items:start}
+.lock-question{min-width:0}
+.lock-question+.lock-question{border-left:1px solid #665477;padding-left:16px}
+.lock-context{grid-column:1/-1;font-size:.85rem;color:var(--good);border-bottom:1px solid #665477;padding-bottom:10px}
+body.playing .questions-together .multiples-workspace{display:block;padding:10px}
+body.playing .questions-together .multiples-workspace h3{font-size:1rem}
+body.playing .questions-together .multiples-workspace label{font-size:.8rem;margin-top:6px}
+body.playing .questions-together .multiples-workspace p{font-size:.8rem}
+body.playing .questions-together .label{font-size:.85rem}
+body.playing .questions-together .options{gap:6px}
+body.playing .questions-together .option{font-size:.85rem;line-height:1.4;padding:8px 10px}
+body.playing .questions-together p{font-size:.85rem}
+body.playing .questions-together .note{font-size:.75rem}
+body.playing .questions-together .poem{font-size:.9rem;line-height:1.5}
+body.playing .game-sidebar{gap:8px}
+body.playing #sidebarInfo{gap:8px}
+body.playing .game-sidebar .team-status{padding:8px}
+body.playing .game-sidebar .status{gap:8px}
+body.playing #sidebarInfo #codeSoFar{margin-top:2px}
+body.playing #interlude{height:100%;width:100%}
+.break-card{height:100%;display:grid;grid-template-rows:auto auto auto auto minmax(0,1fr) auto auto;gap:8px;padding:24px}
+.break-card h2{margin:0;font-size:1.8rem}
+.break-card p{margin:0}
+.break-card .actions{margin:0}
+.break-card small{color:var(--muted);font-size:.8rem}
+#breakGame{min-height:0;display:grid;place-items:center}
+.lantern-grid{width:min(100%,620px);display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.lantern-card{min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse,#634258,#251a38)}
+.lantern-card>span{font-size:2.3rem;color:var(--accent)}
+.lantern-card small{font-size:.75rem}
+.lantern-card.revealed{border-color:var(--good);background:#23443b;opacity:1}
+.firefly-field{position:relative;width:100%;height:100%;min-height:200px;border:1px solid #685580;border-radius:16px;background:radial-gradient(ellipse,#34413b,#161328 70%)}
+#firefly{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);width:64px;height:64px;font-size:2.6rem;color:#ffe8a6;background:#ffcf771a;border:1px solid #ffe8a6;border-radius:50%;box-shadow:0 0 30px #ffe8a666}
+.firefly-finished{font-size:2rem;color:var(--accent)}
+@media(min-width:900px) and (max-height:700px){
+ body.playing .game-sidebar .top{gap:6px;padding-bottom:6px}
+ body.playing .game-sidebar .nav .mini{padding:4px;font-size:.65rem;min-height:28px}
+ body.playing .game-sidebar .team-status>span:last-child{font-size:.65rem;line-height:1.3}
+ body.playing .game-sidebar .clock{font-size:1.5rem}
+ body.playing .game-sidebar .footer .mini{padding:5px}
+ body.playing .game-sidebar .footer p{font-size:.6rem}
+ body.playing .questions-together .option{font-size:.8rem;padding:6px 8px}
+ body.playing .questions-together p{font-size:.8rem;line-height:1.4}
+ body.playing .questions-together .poem{font-size:.8rem}
+ body.playing .room-scene .scene-object{padding:8px;max-width:160px}
+ body.playing .room-scene .scene-object svg{height:75px}
+ body.playing .room-scene .scene-object>span{font-size:.75rem}
+ .break-card{padding:18px}
+ .lantern-card{min-height:85px}
+}
+@media(max-width:899px){
+ body.playing #challenge>.questions-together{grid-template-columns:1fr;gap:18px}
+ .lock-question+.lock-question{border-left:0;border-top:1px solid #665477;padding:14px 0 0}
+ body.playing #exploration{grid-template-rows:auto auto}
+ body.playing .room-scene .scene-object{padding:5px;gap:4px}
+ body.playing .room-scene .scene-object>span{font-size:.7rem}
+ body.playing .room-scene .scene-object small{font-size:.55rem;line-height:1.25}
+ body.playing .room-scene .scene-object svg{height:55px}
+ .search-instruction{font-size:.8rem}
+ .search-instruction span{font-size:.7rem}
+ body.playing #interlude{height:auto;min-height:calc(100dvh - 58px)}
+ .break-card{min-height:calc(100dvh - 58px);height:auto;padding:16px;grid-template-rows:auto auto auto auto minmax(260px,1fr) auto auto}
+ .lantern-grid{gap:8px}
+ .lantern-card{min-height:95px;padding:8px}
+ .break-card .actions{flex-direction:column}
+ .firefly-field{min-height:250px}
+}
+/* Keep the notebook readable at Chromebook heights without adding a scrollbar. */
+body.playing .game-sidebar.viewing-clues .nav{display:none}
+@media(min-width:900px) and (max-height:700px){
+ body.playing .game-sidebar{gap:6px}
+ body.playing .game-sidebar .team-status>span:last-child{display:none}
+ body.playing .game-sidebar .footer p{display:none}
+ body.playing .game-sidebar .progress{margin-top:4px}
+}

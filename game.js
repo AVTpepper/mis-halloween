@@ -14,7 +14,8 @@ const sidebarSlots=['.top','#teamStatus','.status','.room>.row','.footer'].map(s
 });
 function setGameLayout(active){
   toggleSidebar(false,false);
-  sidebarSlots.forEach(({node,anchor})=>active?el('gameSidebar').append(node):anchor.after(node));
+  sidebarSlots.forEach(({node,anchor},i)=>active?el(i===0?'sidebarTop':i===4?'sidebarBottom':'sidebarInfo').append(node):anchor.after(node));
+  el('sidebarInfo').append(el('sidebarPreferences'));
   el('gameSidebar').classList.toggle('hidden',!active);
 }
 function toggleSidebar(open=!document.body.classList.contains('sidebar-open'),focus=true){
@@ -39,11 +40,34 @@ const objects = [
 ];
 let index = 0, code = [], remaining = 1200, running = false, timer = null;
 let activeClue=null;
+let clueHistory=Array.from({length:6},()=>[]),journalRoom=0,journalClue=null,sidebarTab='info',countdownShown=true;
+try{countdownShown=localStorage.getItem('museum-countdown')!=='hidden';}catch{}
+function setSidebarTab(tab){
+  el('gameSidebar').classList.toggle('viewing-clues',tab==='clues');
+  sidebarTab=tab;el('sidebarInfo').classList.toggle('hidden',tab!=='info');el('sidebarClues').classList.toggle('hidden',tab!=='clues');
+  el('infoTab').setAttribute('aria-pressed',String(tab==='info'));el('cluesTab').setAttribute('aria-pressed',String(tab==='clues'));
+}
+function selectJournalRoom(room){journalRoom=room;journalClue=null;renderNotebook();}
+function readClue(i){journalClue=i;if(journalRoom===index)activeClue=i;renderNotebook();save();}
+function renderNotebook(){
+  const found=clueHistory[journalRoom]||[];
+  el('clueCount').textContent=clueHistory.reduce((total,entries)=>total+entries.length,0);
+  el('journalRoom').innerHTML=rooms.map((room,i)=>i<=index&&i<6?`<option value="${i}" ${i===journalRoom?'selected':''}>${i+1}. ${room.title}</option>`:'').join('');
+  if(!found.includes(journalClue))journalClue=found.at(-1)??null;
+  el('clueChips').innerHTML=found.map(i=>`<button class="mini ${i===journalClue?'selected':''}" aria-pressed="${i===journalClue}" onclick="readClue(${i})">${objects[journalRoom][i][1]}</button>`).join('');
+  const clue=journalClue===null?null:objects[journalRoom][journalClue];
+  el('objectClue').innerHTML=clue?`<div class="tag">Clue collected</div><h3>${clue[1]}</h3><p>${clue[2]}</p>`:'<p>Click the glowing objects in the illustration. Collected clues stay here throughout your rescue.</p>';
+}
+function toggleCountdown(){countdownShown=!countdownShown;try{localStorage.setItem('museum-countdown',countdownShown?'shown':'hidden');}catch{}renderPreferences();}
+function renderPreferences(){
+  el('timerToggle').textContent=`Countdown: ${countdownShown?'shown':'hidden'}`;el('timerToggle').setAttribute('aria-pressed',String(countdownShown));
+  el('clock').parentElement.classList.toggle('hidden',!countdownShown);el('mobileClock').classList.toggle('hidden',!countdownShown);el('finalClock').parentElement.classList.toggle('hidden',!countdownShown);MuseumAudio.render();
+}
 let roomFlow={room:0,stage:'search',part:0};
 let selected = {}, inspected = [], answers = {}, jars = [], started = false, won = false, deadline = 0;
 function val(id) { return (el(id)?.value || '').trim(); }
 function save() {
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify({index,code,remaining,running,selected,inspected,answers,jars,started,won,deadline,lives,roomFlow,activeClue,arcade:Snake.snapshot(),exploration:Exploration.snapshot()})); } catch {}
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({index,code,remaining,running,selected,inspected,answers,jars,started,won,deadline,lives,roomFlow,activeClue,clueHistory,interludes:Interludes.snapshot(),arcade:Snake.snapshot(),exploration:Exploration.snapshot()})); } catch {}
 }
 function restore() {
   try {
@@ -53,6 +77,11 @@ function restore() {
     index=s.index; code=s.code; remaining=s.remaining; selected=s.selected || {}; inspected=Array.isArray(s.inspected)?s.inspected:[]; answers=s.answers || {}; jars=Array.isArray(s.jars)?s.jars:[]; started=true; won=!!s.won && index===rooms.length;
     roomFlow=s.roomFlow?.room===index&&['search','mechanism','reveal','lock'].includes(s.roomFlow.stage)?{room:index,stage:s.roomFlow.stage,part:s.roomFlow.part===1?1:0}:{room:index,stage:index<rooms.length&&Exploration.complete(index)&&inspected.length===3?'lock':'search',part:0};
     activeClue=Number.isInteger(s.activeClue)&&inspected.includes(s.activeClue)?s.activeClue:null;
+    roomFlow.part=0;
+    clueHistory=Array.from({length:6},(_,i)=>i<index?[0,1,2]:i===index?[...inspected]:[]);
+    if(Array.isArray(s.clueHistory))s.clueHistory.slice(0,6).forEach((entries,i)=>{if(Array.isArray(entries))clueHistory[i]=[...new Set(entries.filter(n=>[0,1,2].includes(n)))];});
+    Interludes.restore(s.interludes);if(Interludes.pending()!==null&&Interludes.pending()!==index)Interludes.restore(null);
+    journalRoom=Math.min(index,5);journalClue=activeClue;
     running=!won && remaining>0; deadline=s.running&&Number.isFinite(s.deadline)?s.deadline:Date.now()+remaining*1000;
     if(running) remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));
     if(!remaining) running=false;
@@ -61,20 +90,24 @@ function restore() {
 }
 function show(section) {
   Snake.pause(); updateLives();
-  document.body.classList.toggle('playing',section==='game');
-  setGameLayout(section==='game');
+  document.body.classList.toggle('playing',['game','interlude'].includes(section));
+  setGameLayout(['game','interlude'].includes(section));
+  MuseumAudio.setSceneActive(['game','interlude'].includes(section));
   if(section!=='teacher')lockTeacherRoom();
-  ['home','game','final','win','vote','teacher'].forEach(x=>el(x).classList.toggle('hidden',x!==section));
+  ['home','game','interlude','final','win','vote','teacher'].forEach(x=>el(x).classList.toggle('hidden',x!==section));
+  renderNotebook();renderPreferences();
   window.scrollTo({top:0,behavior:'instant'});
   el('main').focus({preventScroll:true});
 }
 function resumeGame() {
   if(!started) return startGame();
   if(won) return show('win');
+  if(Interludes.pending()){Interludes.render();return show('interlude');}
   if(index===rooms.length) { renderFinal(); return show('final'); }
   render(); show('game');
 }
 function startGame(withIntro=true) {
+  Interludes.reset();clueHistory=Array.from({length:6},()=>[]);journalRoom=0;journalClue=null;setSidebarTab('info');
   roomFlow={room:0,stage:'search',part:0};
   activeClue=null; Exploration.reset(); Snake.reset(); lives=TEAM_LIVES; clearInterval(timer); index=0; code=[]; remaining=1200; selected={}; inspected=[]; answers={}; jars=[]; started=true; won=false; running=true; deadline=Date.now()+remaining*1000;
   el('finalCode').value=''; el('finalFeedback').textContent='';
@@ -96,6 +129,8 @@ function updateClock() {
 }
 function render() {
   const r=rooms[index];
+  if(journalRoom!==index){journalRoom=index;journalClue=null;}
+  roomFlow.part=0;
   el('roomNo').textContent=`Room ${index+1} of ${rooms.length}`;
   el('scene').textContent=r.scene; el('title').textContent=r.title; el('story').textContent=r.story;
   el('challenge').dataset.room=index;
@@ -113,10 +148,13 @@ function render() {
     if(match && selected[match[1]]===match[2]) {button.classList.add('selected');button.setAttribute('aria-pressed','true');}
   });
   el('feedback').textContent=remaining?'':'The bell has rung, but you may keep solving.'; el('feedback').className='feedback';
+  renderProgress();
+  renderObjects(); updateClock();
+}
+function renderProgress(){
   el('progress').innerHTML=rooms.map((r,i)=>`<span class="${i<index?'done':''}" title="Room ${i+1}: ${i<index?'cleared':i===index?'current':'waiting'}"></span>`).join('');
   el('progress').setAttribute('aria-label',`${index} of ${rooms.length} rooms cleared`);
   el('codeSoFar').textContent=code.length?code.join(' · '):'None yet';
-  renderObjects(); updateClock();
 }
 function renderObjects() {
   if(roomFlow.room!==index)roomFlow={room:index,stage:'search',part:0};
@@ -127,7 +165,8 @@ function renderObjects() {
   const stage=roomFlow.stage,lock=stage==='lock',search=stage==='search'||stage==='reveal';
   el('exploration').classList.toggle('hidden',lock);
   document.querySelector('.room-scene').classList.toggle('hidden',!search);
-  el('objectClue').classList.toggle('hidden',!search);
+  document.querySelector('.search-instruction').classList.toggle('hidden',!search);
+  clueHistory[index]=[...inspected];renderNotebook();
   document.querySelector('.scene-task').classList.toggle('hidden',stage!=='mechanism');
   el('challenge').classList.toggle('hidden',!lock);
   el('checkBtn').disabled=!ready;
@@ -139,24 +178,22 @@ function renderObjects() {
   next.classList.toggle('hidden',lock&&roomFlow.part===lockPartCount()-1);
   next.disabled=stage==='search'?!objects[index].every((o,i)=>!Exploration.canInspect(index,i)||inspected.includes(i)):stage==='mechanism'?!Exploration.complete(index):stage==='reveal'?!ready:false;
   next.textContent=lock?'Next part \u2192':'Continue \u2192';
-  document.querySelectorAll('.lock-activity').forEach((part,i)=>part.classList.toggle('hidden',i!==roomFlow.part));
+
   if(index===5 && lock)Snake.mount();
 }
-function lockPartCount(){return index===5?1:2;}
+function lockPartCount(){return 1;}
 function splitLockActivities(){
   if(index===5)return;
   const panel=el('challenge').querySelector('.puzzlePanel'),children=[...panel.children];
-  // Keep each original input and listener; changing activity only changes visibility.
   const boundary=index===0?children.indexOf(panel.querySelector('.multiples-workspace'))+1:children.findIndex(child=>child.tagName==='P'&&child.textContent.startsWith('Part B:'));
+  panel.classList.add('questions-together');
+  const context=document.createElement('div');context.className='lock-context';
+  if(index===2){context.textContent='Camera record: at 21:05 Pip was beside the gallery door. At 21:06 the painting was on the floor. No recording shows anyone touching it.';}
+  if(index===3){context.textContent='Museum design cycle: 1 Identify, 2 Imagine, 3 Build & test, 4 Improve. The original camera failed in darkness.';}
+  if(context.textContent)panel.append(context);
   for(let part=0;part<2;part++){
-    const section=document.createElement('section');section.className='lock-activity';
-    section.setAttribute('aria-label',`Lock part ${part+1}`);
-    children.slice(part===0?0:boundary,part===0?boundary:undefined).forEach(child=>section.append(child));
-    if(part===1&&[2,3].includes(index)){
-      const reference=document.createElement('p');reference.className='question-reference';
-      reference.textContent=index===2?'Camera evidence: the painting was on the floor at 21:06. No recording shows who caused it to fall.':'Museum checklist: 1 Identify, 2 Imagine, 3 Build & test, 4 Improve.';
-      section.prepend(reference);
-    }
+    const section=document.createElement('section');section.className='lock-question';section.setAttribute('aria-label',index===0?(part===0?'Multiples workspace':'Lock answer'):'Question '+(part===0?'A':'B'));
+    children.slice(part===0?0:boundary,part===0?boundary:undefined).forEach(child=>{if((index===2&&(child.matches('.evidence')||child.textContent.startsWith('Camera notes:')))||(index===3&&child.matches('.board')))child.remove();else section.append(child);});
     panel.append(section);
   }
 }
@@ -180,7 +217,8 @@ function inspectObject(i) {
   const object=el('exploration').querySelectorAll('.object')[i];
   if(newlyFound)object.classList.add('clue-new');
   object.focus({preventScroll:true});
-  Snake.pause();
+  Snake.pause();journalRoom=index;journalClue=i;setSidebarTab('clues');renderNotebook();if(newlyFound)MuseumAudio.play('clue');
+  if(matchMedia('(max-width:899px)').matches)toggleSidebar(true);
 }
 function paintJar(button,i) { button.classList.toggle('filled',jars.includes(i)); button.setAttribute('aria-pressed',String(jars.includes(i))); }
 function updateJars() { el('jarCount').textContent=`${jars.length} of 12 jars filled. Model three-fourths, then enter your answer.`; }
@@ -193,6 +231,7 @@ function choose(group,value,button) {
 function showHint() {el('feedback').className='feedback';el('feedback').textContent='👻 Pip whispers: '+rooms[index].hint;}
 let lockEffectTimer=null;
 function playLockEffect(success,roomIndex=index,finalRescue=false) {
+  MuseumAudio.play(success?'success':'failure');
   clearTimeout(lockEffectTimer);
   document.querySelector('.lock-effect')?.remove();
   const effect=document.createElement('div');
@@ -224,12 +263,15 @@ function checkAnswer() {
   if(!r.validate()) {loseLife('The lock stays closed. Revisit the clues and discuss your answers.');return;}
   playLockEffect(true);
   code.push(r.digit);index++;activeClue=null;selected={};inspected=[];answers={};jars=[];
+  renderProgress();
   if(index===rooms.length) {renderFinal();show('final');}
-  else {render();show('game');el('feedback').textContent='✓ Lock opened! '+r.reveal;}
+  else if(Interludes.begin(index)){show('interlude');}
+  else {render();setSidebarTab('info');show('game');el('feedback').textContent='✓ Lock opened! '+r.reveal;}
   save();
   document.querySelector('.lock-effect')?.remove();
   Cutscene.play(index);
 }
+function renderRoomAfterBreak(){render();setSidebarTab('info');show('game');el('activityTitle').focus({preventScroll:true});}
 function updateLives() {
   el('teamStatus').classList.toggle('hidden',!started||won);
   el('lives').textContent=lives+' / '+TEAM_LIVES+' lives';
@@ -288,7 +330,7 @@ function unlockTeacherRoom(event) {
   }
   el('teacherCode').removeAttribute('aria-invalid');el('teacherCode').value='';
   el('teacherGate').classList.add('hidden');
-  el('teacherInfo').innerHTML=`<div class="card"><h2>Plan the rescue</h2><p>Allow 5 minutes to introduce Pip, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for 2–3 minutes per curriculum room and reserve 4–5 minutes for the arcade and final code. Teams use one device; two teammates take the Snake turns.</p><p>Once a team starts, its countdown continues during cutscenes, navigation, teacher access, Snake pauses and time away from the site. Students cannot pause it. At zero time, teams may keep solving.</p><p><b>Five shared lives:</b> an incorrect puzzle submission, incorrect final code or Snake crash costs one life. Hints and inspecting objects are free. Losing the last life automatically resets all answers, digits, arcade progress and the timer, and restores five lives.</p><p>Progress is saved in the current browser when storage is available. Use Start a new team game between groups. Refresh restores progress but never starts the snake automatically.</p></div>
+  el('teacherInfo').innerHTML=`<div class="card"><h2>Plan the rescue</h2><p>Allow 5 minutes to introduce Pip, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for 2–3 minutes per curriculum room and reserve 4–5 minutes for the arcade and final code. Teams use one device; two teammates take the Snake turns.</p><p>Once a team starts, its countdown continues during cutscenes, navigation, teacher access, Snake pauses and time away from the site. Students cannot pause it. At zero time, teams may keep solving.</p><p>Optional lantern matching follows the potion room, and a firefly-catching break follows the robot room. Both can be skipped and cost no lives. The Info tab can hide the countdown; it still runs, and reaching zero never ends the rescue. Sound and quiet ambient music are optional and start off. Related lock questions share one screen, and the Clues tab keeps discoveries from every visited room.</p><p><b>Five shared lives:</b> an incorrect puzzle submission, incorrect final code or Snake crash costs one life. Hints and inspecting objects are free. Losing the last life automatically resets all answers, digits, arcade progress and the timer, and restores five lives.</p><p>Progress is saved in the current browser when storage is available. Use Start a new team game between groups. Refresh restores progress but never starts the snake automatically.</p></div>
     <div class="teacher-stages">${rooms.map((room,i)=>`<article class="card"><div class="tag">Stage ${i+1} · digit ${room.digit}</div><h2>${room.scene} ${room.title}</h2><p><b>Learning focus:</b> ${teacherStages[i].goal}</p><p><b>Scene walkthrough:</b> ${Exploration.guide(i)}</p><p><b>Answer and reasoning:</b> ${teacherStages[i].answer}</p><p><b>Discuss with students:</b> ${teacherStages[i].discussion}</p><p><b>Available hint:</b> ${room.hint}</p></article>`).join('')}</div>
     <div class="card"><h2>The final painting</h2><p>Assemble the six digits in room order: <strong class="teacher-rescue-code">${rooms.map(room=>room.digit).join('')}</strong>. A wrong rescue code costs one life. A correct code releases Pip and starts the celebration.</p><h3>Costume awards setup</h3><p>Create a Google Form for funniest, scariest, most creative and best homemade costume; link its responses to Google Sheets. In game.js, set GOOGLE_FORM_URL to the published HTTPS responder link ending in /viewform. A forms.gle short link opens in a new tab. Use costume labels or nominee numbers and check school access settings on a student device.</p><h3>Curriculum and deployment notes</h3><p>The supplied curriculum links are PYP 6 maths, perception and responsibility, technology limitations, persuasion and poetry. The original six teaching resources were not included in this checkout, so their alignment has not been independently verified. The questions are original.</p><p>This static site works offline and on GitHub Pages. The README includes deployment, editing, voting and ZIP instructions. This code gate keeps teacher information out of the normal student view; it is not secure authentication, and source inspection can reveal answers.</p></div>
     <button class="secondary" onclick="openTeacherRoom()">Lock teacher room</button>`;
@@ -297,4 +339,4 @@ function unlockTeacherRoom(event) {
 
 // PASTE YOUR GOOGLE FORM /viewform LINK BELOW. Do not use the /edit link.
 const GOOGLE_FORM_URL='';
-function mountForm(){if(!GOOGLE_FORM_URL)return;let url;try{url=new URL(GOOGLE_FORM_URL);if(url.protocol!=='https:'||!(url.hostname==='docs.google.com'||url.hostname==='forms.gle'))return}catch{return}const shell=el('formShell');shell.innerHTML='';if(url.hostname==='docs.google.com'&&url.pathname.includes('/forms/')&&url.pathname.includes('/viewform')){const iframe=document.createElement('iframe');iframe.title='PYP 6 costume awards Google Form';url.searchParams.set('embedded','true');iframe.src=url.toString();iframe.loading='lazy';shell.append(iframe)}else{let p=document.createElement('p');p.textContent='Use the button below to open costume voting.';shell.append(p)}let a=document.createElement('a');a.href=GOOGLE_FORM_URL;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open the voting form in a new tab ↗';a.style.color='#ffbb6d';shell.append(a)}document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target?.id==='finalCode')unlock()});restore();mountForm();updateClock();if(started)timer=setInterval(tick,1000);
+function mountForm(){if(!GOOGLE_FORM_URL)return;let url;try{url=new URL(GOOGLE_FORM_URL);if(url.protocol!=='https:'||!(url.hostname==='docs.google.com'||url.hostname==='forms.gle'))return}catch{return}const shell=el('formShell');shell.innerHTML='';if(url.hostname==='docs.google.com'&&url.pathname.includes('/forms/')&&url.pathname.includes('/viewform')){const iframe=document.createElement('iframe');iframe.title='PYP 6 costume awards Google Form';url.searchParams.set('embedded','true');iframe.src=url.toString();iframe.loading='lazy';shell.append(iframe)}else{let p=document.createElement('p');p.textContent='Use the button below to open costume voting.';shell.append(p)}let a=document.createElement('a');a.href=GOOGLE_FORM_URL;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open the voting form in a new tab ↗';a.style.color='#ffbb6d';shell.append(a)}document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target?.id==='finalCode')unlock()});restore();mountForm();updateClock();renderPreferences();renderNotebook();if(started)timer=setInterval(tick,1000);
