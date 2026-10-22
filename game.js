@@ -7,6 +7,25 @@ const rooms=[
 ];
 rooms.push({title:'The Serpent Arcade',scene:'🐍',story:'The museum’s security serpents guard the last digit. Two teammates must take turns at the controls. Each must clear 10 levels to power the final lock.',html:'<div class="puzzlePanel"><h3>Two players. Ten levels each.</h3><p>Collect 10 sparks per player. Avoid walls and your tail: a crash costs a life and resets your turn. Use arrows, WASD or the direction buttons. Pause before passing the keyboard.</p><div id="snakeGame"></div></div>',hint:'Plan wide turns and leave space around your tail. You can pause your turn to discuss your route. Both players need 10 / 10 before the lock opens.',validate:()=>Snake.complete(),digit:'7',reveal:'Both players cleared 10 levels. The security serpents release digit 7.'});
 const el = id => document.getElementById(id);
+// Move the existing controls rather than duplicating timer, navigation or save state.
+const sidebarSlots=['.top','#teamStatus','.status','.room>.row','.footer'].map(selector=>{
+  const node=document.querySelector(selector),anchor=document.createComment('Original information position');
+  node.before(anchor);return {node,anchor};
+});
+function setGameLayout(active){
+  toggleSidebar(false,false);
+  sidebarSlots.forEach(({node,anchor})=>active?el('gameSidebar').append(node):anchor.after(node));
+  el('gameSidebar').classList.toggle('hidden',!active);
+}
+function toggleSidebar(open=!document.body.classList.contains('sidebar-open'),focus=true){
+  if(open)Snake.pause();
+  document.body.classList.toggle('sidebar-open',open);
+  el('sidebarToggle').setAttribute('aria-expanded',String(open));
+  el('main').inert=open&&matchMedia('(max-width:899px)').matches;
+  if(focus)(open?el('sidebarClose'):el('sidebarToggle')).focus({preventScroll:true});
+}
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.body.classList.contains('sidebar-open'))toggleSidebar(false);});
+matchMedia('(min-width:900px)').addEventListener('change',()=>toggleSidebar(false,false));
 const SAVE_KEY = 'midnight-museum-v2';
 const TEAM_LIVES = 5;
 let lives = TEAM_LIVES;
@@ -43,6 +62,7 @@ function restore() {
 function show(section) {
   Snake.pause(); updateLives();
   document.body.classList.toggle('playing',section==='game');
+  setGameLayout(section==='game');
   if(section!=='teacher')lockTeacherRoom();
   ['home','game','final','win','vote','teacher'].forEach(x=>el(x).classList.toggle('hidden',x!==section));
   window.scrollTo({top:0,behavior:'instant'});
@@ -71,6 +91,7 @@ function tick() {
 function updateClock() {
   el('clock').textContent=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
   el('clock').classList.toggle('low',remaining<180);
+  el('mobileClock').textContent=el('clock').textContent;
   if(el('finalClock')) el('finalClock').textContent=el('clock').textContent;
 }
 function render() {
@@ -212,6 +233,7 @@ function checkAnswer() {
 function updateLives() {
   el('teamStatus').classList.toggle('hidden',!started||won);
   el('lives').textContent=lives+' / '+TEAM_LIVES+' lives';
+  el('mobileLives').textContent=el('lives').textContent;
   el('lives').setAttribute('aria-label',lives+' of '+TEAM_LIVES+' team lives remaining');
 }
 // Returns false when the whole rescue was restarted.
