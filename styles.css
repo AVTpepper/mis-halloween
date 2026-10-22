@@ -18,7 +18,7 @@
 body.playing .scene{display:none}
 body.playing .room{max-width:none;padding:16px}
 body.playing #title{font-size:1.65rem;margin:4px 0}
-body.playing .room-scene{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:1fr;gap:8px;height:220px;min-height:220px;margin:8px 0;padding:14px 8px 40px}
+body.playing .room-scene{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:1fr;gap:8px;height:250px;min-height:250px;margin:8px 0;padding:14px 8px 40px}
 body.playing .room-scene .scene-object,body.playing .room-scene .sealed-prop{position:relative;left:auto;top:auto;transform:none;align-self:center;justify-self:center;width:100%;max-width:155px;height:auto;margin:0;padding:4px;grid-row:1}
 body.playing .room-scene .scene-object[data-slot=left],body.playing .room-scene .sealed-prop[data-slot=left]{grid-column:1}
 body.playing .room-scene .scene-object[data-slot=center],body.playing .room-scene .sealed-prop[data-slot=center]{grid-column:2}
@@ -68,7 +68,7 @@ body.playing .feedback{min-height:0;margin:6px 0}
  body.playing .progress{gap:4px}
  body.playing .progress span{width:20px}
  body.playing .room{padding:12px}
- body.playing .room-scene{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:150px 145px;height:350px;min-height:350px;padding:10px 6px 35px;gap:6px}
+ body.playing .room-scene{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:185px 175px;height:420px;min-height:420px;padding:10px 6px 35px;gap:6px}
  body.playing .room-scene .scene-object[data-slot=left],body.playing .room-scene .sealed-prop[data-slot=left]{grid-column:1;grid-row:1}
  body.playing .room-scene .scene-object[data-slot=right],body.playing .room-scene .sealed-prop[data-slot=right]{grid-column:2;grid-row:1}
  body.playing .room-scene .scene-object[data-slot=center],body.playing .room-scene .sealed-prop[data-slot=center]{grid-column:1/-1;grid-row:2}
