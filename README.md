@@ -25,6 +25,8 @@ Experiments are free to retry; only incorrect lock submissions, wrong final code
 | Poet’s study | Move five torn strips into their Roman-numeral stamp order I–V | The restored page behind the portrait, ready for reading its first letters |
 | Serpent arcade | Activate both player power switches | The cabinet and service card, followed by the two-player, ten-level Snake challenge |
 
+In the clock illustration, the short hour hand stays at 12 and only the long minute hand turns with the slider. The lock challenge provides two blank multiples fields for students’ own working; no completed lists are supplied. Entries are saved across refreshes and cleared when a new team starts. The final numerical answer is checked as before.
+
 Current saves keep previously earned room digits. A room that was in progress before the exploratory update starts with its new mechanism unsolved while retaining collected clues. All six walkthroughs are also inside the code-gated Teacher room.
 
 Progress, clue discoveries, answers and the timer are saved in this browser's local storage when available. The countdown continues while the tab is closed unless paused. Refresh, select Continue, and pick up where you left off. Use **Start a new team game** between teams; restarting an existing game asks for confirmation. Storage restrictions may prevent recovery, but the game still works. Teams should use one device each. No student names or answers are sent to a server by the escape game.
