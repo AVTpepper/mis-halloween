@@ -20,10 +20,11 @@ const objects = [
 ];
 let index = 0, code = [], remaining = 1200, running = false, timer = null;
 let activeClue=null;
+let roomFlow={room:0,stage:'search',part:0};
 let selected = {}, inspected = [], answers = {}, jars = [], started = false, won = false, deadline = 0;
 function val(id) { return (el(id)?.value || '').trim(); }
 function save() {
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify({index,code,remaining,running,selected,inspected,answers,jars,started,won,deadline,lives,arcade:Snake.snapshot(),exploration:Exploration.snapshot()})); } catch {}
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({index,code,remaining,running,selected,inspected,answers,jars,started,won,deadline,lives,roomFlow,activeClue,arcade:Snake.snapshot(),exploration:Exploration.snapshot()})); } catch {}
 }
 function restore() {
   try {
@@ -31,6 +32,8 @@ function restore() {
     if (!s || !Number.isInteger(s.lives) || s.lives<1 || s.lives>TEAM_LIVES || !s.started || !Number.isInteger(s.index) || s.index < 0 || s.index > rooms.length || !Array.isArray(s.code) || s.code.join('') !== rooms.slice(0,s.index).map(r=>r.digit).join('') || s.code.length !== s.index || !Number.isFinite(s.remaining) || s.remaining < 0 || s.remaining > 1200) return;
     lives=s.lives; Snake.restore(s.arcade); Exploration.restore(s.exploration);
     index=s.index; code=s.code; remaining=s.remaining; selected=s.selected || {}; inspected=Array.isArray(s.inspected)?s.inspected:[]; answers=s.answers || {}; jars=Array.isArray(s.jars)?s.jars:[]; started=true; won=!!s.won && index===rooms.length;
+    roomFlow=s.roomFlow?.room===index&&['search','mechanism','reveal','lock'].includes(s.roomFlow.stage)?{room:index,stage:s.roomFlow.stage,part:s.roomFlow.part===1?1:0}:{room:index,stage:index<rooms.length&&Exploration.complete(index)&&inspected.length===3?'lock':'search',part:0};
+    activeClue=Number.isInteger(s.activeClue)&&inspected.includes(s.activeClue)?s.activeClue:null;
     running=!won && remaining>0; deadline=s.running&&Number.isFinite(s.deadline)?s.deadline:Date.now()+remaining*1000;
     if(running) remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));
     if(!remaining) running=false;
@@ -52,6 +55,7 @@ function resumeGame() {
   render(); show('game');
 }
 function startGame(withIntro=true) {
+  roomFlow={room:0,stage:'search',part:0};
   activeClue=null; Exploration.reset(); Snake.reset(); lives=TEAM_LIVES; clearInterval(timer); index=0; code=[]; remaining=1200; selected={}; inspected=[]; answers={}; jars=[]; started=true; won=false; running=true; deadline=Date.now()+remaining*1000;
   el('finalCode').value=''; el('finalFeedback').textContent='';
   el('enterBtn').textContent='Continue your rescue →';
@@ -73,7 +77,9 @@ function render() {
   const r=rooms[index];
   el('roomNo').textContent=`Room ${index+1} of ${rooms.length}`;
   el('scene').textContent=r.scene; el('title').textContent=r.title; el('story').textContent=r.story;
+  el('challenge').dataset.room=index;
   el('challenge').innerHTML=r.html;
+  splitLockActivities();
   if(index===1) {
     const board=el('challenge').querySelector('.board');
     board.innerHTML=Array.from({length:12},(_,i)=>`<button class="jar" aria-label="Jar ${i+1}" aria-pressed="false" onclick="toggleJar(${i},this)">🫙</button>`).join('')+'<p id="jarCount" role="status"></p>';
@@ -92,11 +98,52 @@ function render() {
   renderObjects(); updateClock();
 }
 function renderObjects() {
+  if(roomFlow.room!==index)roomFlow={room:index,stage:'search',part:0};
   el('exploration').innerHTML=Exploration.render(index);
   const ready=Exploration.complete(index)&&objects[index].every((o,i)=>inspected.includes(i));
-  el('lockPrompt').classList.toggle('hidden',ready);
-  el('challenge').classList.toggle('hidden',!ready); el('checkBtn').disabled=!ready;
-  if(index===5 && ready) Snake.mount();
+  // A stale or older save may point at a later activity before its prerequisites.
+  if(roomFlow.stage==='lock'&&!ready)roomFlow.stage=Exploration.complete(index)?'reveal':'search';
+  const stage=roomFlow.stage,lock=stage==='lock',search=stage==='search'||stage==='reveal';
+  el('exploration').classList.toggle('hidden',lock);
+  document.querySelector('.room-scene').classList.toggle('hidden',!search);
+  el('objectClue').classList.toggle('hidden',!search);
+  document.querySelector('.scene-task').classList.toggle('hidden',stage!=='mechanism');
+  el('challenge').classList.toggle('hidden',!lock);
+  el('checkBtn').disabled=!ready;
+  el('checkBtn').classList.toggle('hidden',!lock||roomFlow.part<lockPartCount()-1);
+  el('activityBack').disabled=stage==='search';
+  const labels={search:'1 / 4 · Search the room',mechanism:'2 / 4 · Try the mechanism',reveal:'3 / 4 · Read the hidden clues',lock:`4 / 4 · Solve the lock${lockPartCount()>1?` · Part ${roomFlow.part+1} of ${lockPartCount()}`:''}`};
+  el('activityTitle').textContent=labels[stage];
+  const next=el('activityNext');
+  next.classList.toggle('hidden',lock&&roomFlow.part===lockPartCount()-1);
+  next.disabled=stage==='search'?!objects[index].every((o,i)=>!Exploration.canInspect(index,i)||inspected.includes(i)):stage==='mechanism'?!Exploration.complete(index):stage==='reveal'?!ready:false;
+  next.textContent=stage==='search'?'Try the mechanism →':stage==='mechanism'?'Search the opened compartment →':stage==='reveal'?'Solve the lock →':'Next part →';
+  document.querySelectorAll('.lock-activity').forEach((part,i)=>part.classList.toggle('hidden',i!==roomFlow.part));
+  if(index===5 && lock)Snake.mount();
+}
+function lockPartCount(){return index===5?1:2;}
+function splitLockActivities(){
+  if(index===5)return;
+  const panel=el('challenge').querySelector('.puzzlePanel'),children=[...panel.children];
+  // Keep each original input and listener; changing activity only changes visibility.
+  const boundary=index===0?children.indexOf(panel.querySelector('.multiples-workspace'))+1:children.findIndex(child=>child.tagName==='P'&&child.textContent.startsWith('Part B:'));
+  for(let part=0;part<2;part++){
+    const section=document.createElement('section');section.className='lock-activity';
+    section.setAttribute('aria-label',`Lock part ${part+1}`);
+    children.slice(part===0?0:boundary,part===0?boundary:undefined).forEach(child=>section.append(child));
+    panel.append(section);
+  }
+}
+function moveActivity(direction){
+  const stages=['search','mechanism','reveal','lock'];
+  if(direction>0&&el('activityNext').disabled)return;
+  Snake.pause();
+  if(roomFlow.stage==='lock'&&direction<0&&roomFlow.part>0)roomFlow.part--;
+  else if(roomFlow.stage==='lock'&&direction>0&&roomFlow.part<lockPartCount()-1)roomFlow.part++;
+  else {roomFlow.stage=stages[Math.max(0,Math.min(3,stages.indexOf(roomFlow.stage)+direction))];roomFlow.part=0;}
+  el('feedback').textContent='';
+  renderObjects();save();el('activityTitle').focus({preventScroll:true});
+  window.scrollTo({top:0,behavior:'instant'});
 }
 function inspectObject(i) {
   if(!Exploration.canInspect(index,i))return;
@@ -108,7 +155,6 @@ function inspectObject(i) {
   if(newlyFound)object.classList.add('clue-new');
   object.focus({preventScroll:true});
   Snake.pause();
-  el('objectClue').scrollIntoView({block:'nearest',behavior:'instant'});
 }
 function paintJar(button,i) { button.classList.toggle('filled',jars.includes(i)); button.setAttribute('aria-pressed',String(jars.includes(i))); }
 function updateJars() { el('jarCount').textContent=`${jars.length} of 12 jars filled. Model three-fourths, then enter your answer.`; }
@@ -144,6 +190,7 @@ function playLockEffect(success,roomIndex=index,finalRescue=false) {
   lockEffectTimer=setTimeout(()=>effect.remove(),success?1550:950);
 }
 function checkAnswer() {
+  if(roomFlow.stage!=='lock'||roomFlow.part!==lockPartCount()-1)return;
   if(!Exploration.complete(index))return;
   if(index===5 && !Snake.complete())return;
   if(!objects[index].every((o,i)=>inspected.includes(i))) return;

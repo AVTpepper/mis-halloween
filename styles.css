@@ -12,13 +12,23 @@
 @media(max-width:600px){.room-scene{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:190px 190px;gap:18px 12px;height:auto;min-height:490px;padding:28px 12px 50px}.room-scene .scene-object,.room-scene .sealed-prop{position:relative;left:auto;top:auto;transform:none;align-self:start;justify-self:center;width:100%;max-width:135px;margin:0;padding:5px}.room-scene .scene-object:hover{transform:scale(1.03)}.room-scene .scene-object svg{height:95px}.room-scene .sealed-prop:hover{transform:none}.room-scene .scene-object[data-slot=left],.room-scene .sealed-prop[data-slot=left]{grid-column:1;grid-row:1}.room-scene .scene-object[data-slot=right],.room-scene .sealed-prop[data-slot=right]{grid-column:2;grid-row:1}.room-scene .scene-object[data-slot=center],.room-scene .sealed-prop[data-slot=center]{grid-column:1/-1;grid-row:2;max-width:160px}.room-scene .scene-object>span{font-size:.75rem}.room-scene .scene-object small{font-size:.62rem}.room-scene .sealed-prop{height:150px}.room-scene .scene-caption{padding:10px;min-height:35px}}
 .object-clue{margin:16px 0;padding:18px 20px;border:1px solid #b99b69;border-left:4px solid var(--accent);border-radius:12px;background:#2d223c;scroll-margin:20px}.object-clue h3{margin:8px 0}.object-clue p{color:var(--text);margin:6px 0;line-height:1.65}
 .mixing-bench .drop-orange{border-color:#ffa34d;box-shadow:inset 4px 0 #ffa34d}.mixing-bench .drop-purple{border-color:#c486db;box-shadow:inset 4px 0 #c486db}
-/* Keep the rescue workspace compact; supporting text expands on demand. */
-.room-brief summary,.search-help summary,.cluebook summary{cursor:pointer;color:var(--good);font-size:.85rem;font-weight:750;padding:6px 0}
-.lock-prompt{padding:20px;border:1px dashed #8d759d;border-radius:12px;align-self:start}
+/* A room presents one activity at a time, with no nested scroll containers. */
+body.playing .wrap{max-width:1240px;padding:10px 20px}
+body.playing .top{padding-bottom:8px}
+body.playing .team-status{margin:8px 0;padding:6px 12px}
+body.playing .status{margin:8px 0}
+body.playing .status>div{display:flex;align-items:center;gap:12px}
+body.playing .clock{font-size:1.4rem}
+body.playing .room{max-width:none;padding:16px 20px;display:grid;grid-template-columns:1fr auto;gap:6px 16px}
 body.playing .scene{display:none}
-body.playing .room{max-width:none;padding:16px}
-body.playing #title{font-size:1.65rem;margin:4px 0}
-body.playing .room-scene{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:1fr;gap:8px;height:250px;min-height:250px;margin:8px 0;padding:14px 8px 40px}
+body.playing #roomNo{grid-column:1;font-size:.7rem}
+body.playing #title{grid-column:1;font-size:1.65rem;margin:0}
+body.playing .story-button{grid-column:2;grid-row:1/3;align-self:center}
+body.playing #activityTitle{grid-column:1/-1;color:var(--good);font-size:.85rem;margin:2px 0 6px;font-weight:750}
+#activityTitle:focus{outline:none}
+body.playing #exploration,body.playing #challenge{grid-column:1/-1;min-width:0}
+body.playing #exploration{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:16px;align-items:center}
+body.playing .room-scene{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:1fr;gap:8px;height:240px;min-height:240px;margin:0;padding:12px 8px 38px}
 body.playing .room-scene .scene-object,body.playing .room-scene .sealed-prop{position:relative;left:auto;top:auto;transform:none;align-self:center;justify-self:center;width:100%;max-width:155px;height:auto;margin:0;padding:4px;grid-row:1}
 body.playing .room-scene .scene-object[data-slot=left],body.playing .room-scene .sealed-prop[data-slot=left]{grid-column:1}
 body.playing .room-scene .scene-object[data-slot=center],body.playing .room-scene .sealed-prop[data-slot=center]{grid-column:2}
@@ -27,49 +37,186 @@ body.playing .room-scene .scene-object:hover{transform:scale(1.03)}
 body.playing .room-scene .scene-object svg{height:85px}
 body.playing .room-scene .scene-object>span{font-size:.75rem}
 body.playing .room-scene .scene-object small{font-size:.6rem}
-body.playing .object-clue{margin:8px 0;padding:10px 12px}
+body.playing .object-clue{margin:0;padding:14px}
 body.playing .object-clue h3{font-size:1rem;margin:3px 0}
-body.playing .object-clue p{font-size:.9rem;line-height:1.45}
-body.playing .scene-task{margin:8px 0;padding:12px}
+body.playing .object-clue p{font-size:.95rem;line-height:1.5}
+body.playing .scene-task{grid-column:1/-1;margin:0;padding:16px 20px;position:relative}
 body.playing .scene-task p{margin:6px 0;font-size:.9rem}
-body.playing .puzzlePanel{margin:0;padding:14px}
+body.playing .scene-task label{margin:6px 0}
+body.playing .scene-task select{padding:8px;margin-bottom:6px}
+.mechanism-clocks{display:flex;gap:12px;float:right;margin-left:20px}
+.mechanism-clocks svg{width:85px;height:90px}
+body.playing .puzzlePanel{margin:0;padding:16px 20px}
+body.playing .puzzlePanel p{margin:6px 0 10px}
 body.playing .clockface,body.playing .bottles{display:none}
+body.playing .multiples-workspace{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;margin:8px 0 0;padding:12px}
+body.playing .multiples-workspace h3,body.playing .multiples-workspace p{grid-column:1/-1;margin:0}
+body.playing .multiples-workspace label{margin:4px 0 0}
+body.playing #clockMultiplesA{grid-column:1;grid-row:4}
+body.playing #clockMultiplesB{grid-column:2;grid-row:4}
+body.playing .options{margin:8px 0;gap:6px}
+body.playing .option{padding:9px 12px}
+body.playing .label{margin:8px 0 4px}
+body.playing .evidence{grid-template-columns:repeat(3,1fr)}
+body.playing .tile{min-height:56px;font-size:1.1rem}
+body.playing .board{margin:8px 0;padding:10px}
+body.playing .jar{padding:3px;font-size:1.3rem}
+body.playing .poem{line-height:1.5;padding:8px 14px;font-size:1rem}
+body.playing .evidence-sort{margin:8px 0;padding:8px}
+body.playing .poem-strips{gap:5px;margin:8px 0 0}
+body.playing .poem-strips li{padding:5px 10px}
+body.playing .poem-strips .mini{padding:4px 10px}
+body.playing .mixing-bench{margin:12px 0}
+body.playing .room>.actions{grid-column:1/-1;margin:6px 0 0;gap:8px}
+body.playing .feedback{grid-column:1/-1;min-height:0;margin:0;font-size:.9rem}
 body.playing .feedback:empty{display:none}
-body.playing .feedback{min-height:0;margin:6px 0}
+body.playing .room>.row{grid-column:1/-1;font-size:.8rem;gap:8px}
+body.playing .footer{display:flex;justify-content:space-between;align-items:center;margin:8px 0 0}
+body.playing .footer p{margin:0}
+#roomStory{max-width:650px;background:var(--panel);color:var(--text);border:1px solid #8d759d;border-radius:18px;padding:24px}
+#roomStory::backdrop{background:#100c1fcc}
+/* The arcade board and its controls share a single activity screen. */
+body.playing #challenge:has(#snakeGame) .puzzlePanel{display:grid;grid-template-columns:minmax(200px,1fr) minmax(0,2fr);gap:8px 20px}
+body.playing #challenge:has(#snakeGame) h3{grid-column:1;margin:0}
+body.playing #challenge:has(#snakeGame) .puzzlePanel>p{grid-column:1;font-size:.9rem}
+body.playing #snakeGame{grid-column:2;grid-row:1/3;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center}
+body.playing .snake-scores{grid-column:1/-1;font-size:.8rem}
+body.playing .snake-scores p{margin:0}
+body.playing #snakeMessage{grid-column:1/-1;min-height:0;font-size:.8rem;margin:0}
+body.playing #snakeCanvas{grid-column:1;grid-row:3/5;width:min(100%,240px);margin:0 auto}
+body.playing #snakeGame>.actions{grid-column:2;grid-row:3;margin:0}
+body.playing .snake-controls{grid-column:2;grid-row:4;grid-template-columns:repeat(3,44px);margin:0;gap:4px}
+body.playing .snake-controls button{min-height:40px;padding:4px}
 @media(min-width:900px) and (min-height:560px){
- body.playing .wrap{max-width:1440px;height:100vh;height:100dvh;display:flex;flex-direction:column;padding:10px 20px;gap:8px}
- body.playing .top{padding-bottom:8px;flex-shrink:0}
- body.playing .team-status{margin:0;padding:6px 12px;flex-shrink:0}
- body.playing #main{flex:1;min-height:0}
- body.playing #game{height:100%;display:flex;flex-direction:column;gap:8px}
- body.playing .status{margin:0;flex-shrink:0}
- body.playing .status>div{display:flex;align-items:center;gap:12px}
- body.playing .clock{font-size:1.4rem}
- body.playing .room{flex:1;min-height:0;width:100%;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr) auto auto auto;column-gap:20px}
- body.playing #roomNo,body.playing #title,body.playing .room-brief{grid-column:1/-1}
- body.playing .room-brief{margin-bottom:6px;max-height:100px;overflow:auto}
- body.playing #exploration{grid-column:1;grid-row:4/8;overflow:auto;min-height:0;padding:0 6px 4px 0;scrollbar-gutter:stable}
- body.playing #challenge,body.playing #lockPrompt{grid-column:2;grid-row:4;overflow:auto;min-height:0;margin:0;scrollbar-gutter:stable}
- body.playing .room>.actions{grid-column:2;grid-row:5;margin-top:8px}
- body.playing #feedback{grid-column:2;grid-row:6}
- body.playing .room>.row{grid-column:2;grid-row:7;margin-top:6px;font-size:.85rem}
- body.playing .footer{display:flex;justify-content:space-between;align-items:center;margin:0;flex-shrink:0}
- body.playing .footer p{margin:0}
+ body.playing .wrap{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+ body.playing #main{flex:1;display:flex;align-items:center}
+ body.playing #game{width:100%}
 }
-@media(max-width:600px){
- body.playing .wrap{padding:8px 10px 24px}
- body.playing .top{gap:6px;padding-bottom:8px}
+@media(max-width:700px){
+ body.playing .wrap{padding:8px 10px 16px}
+ body.playing .top{gap:6px}
  body.playing .nav{display:flex;gap:5px}
  body.playing .nav .mini{font-size:.72rem;padding:7px 8px}
- body.playing .team-status{margin:8px 0;padding:8px;gap:6px}
+ body.playing .team-status{gap:6px;padding:6px 8px}
  body.playing .team-status>span:last-child{display:none}
- body.playing .status{margin:10px 0}
  body.playing .status .tag{font-size:.6rem}
+ body.playing .status>div{display:block}
  body.playing .progress{gap:4px}
  body.playing .progress span{width:20px}
- body.playing .room{padding:12px}
- body.playing .room-scene{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:185px 175px;height:420px;min-height:420px;padding:10px 6px 35px;gap:6px}
- body.playing .room-scene .scene-object[data-slot=left],body.playing .room-scene .sealed-prop[data-slot=left]{grid-column:1;grid-row:1}
- body.playing .room-scene .scene-object[data-slot=right],body.playing .room-scene .sealed-prop[data-slot=right]{grid-column:2;grid-row:1}
- body.playing .room-scene .scene-object[data-slot=center],body.playing .room-scene .sealed-prop[data-slot=center]{grid-column:1/-1;grid-row:2}
+ body.playing .room{padding:12px;gap:6px}
+ body.playing #title{font-size:1.35rem}
+ body.playing #exploration{grid-template-columns:1fr;gap:8px}
+ body.playing .room-scene{height:220px;min-height:220px;padding:8px 4px 34px;gap:2px}
+ body.playing .room-scene .scene-object svg{height:65px}
+ body.playing .room-scene .scene-object>span{font-size:.65rem;padding:4px}
+ body.playing .room-scene .scene-object small{display:none}
+ body.playing .object-clue{padding:10px}
+ body.playing .object-clue .tag{display:none}
+ body.playing .object-clue p{font-size:.85rem;margin:4px 0}
+ body.playing .scene-task,body.playing .puzzlePanel{padding:12px}
+ body.playing .multiples-workspace{display:block}
+ body.playing .multiples-workspace input{padding:8px}
+ body.playing .room>.actions button{font-size:.8rem;padding:9px 10px}
+ body.playing .footer p{display:none}
+ .mechanism-clocks{float:none;justify-content:center;margin:0}
+ .mechanism-clocks svg{width:65px;height:65px}
+ body.playing #challenge:has(#snakeGame) .puzzlePanel{display:block}
+ body.playing #snakeGame{display:flex;flex-direction:column}
+ body.playing #snakeCanvas{width:min(100%,230px)}
+ body.playing #snakeGame>.actions{margin:4px 0}
+}
+@media(min-width:701px) and (max-width:899px){
+ body.playing #exploration{grid-template-columns:1fr}
+}
+/* Leave ample height for reading and answering on classroom Chromebooks. */
+@media(min-width:900px){
+ body.playing .room{padding:12px 16px;gap:4px 12px}
+ body.playing .room>.actions button{padding:8px 12px}
+ body.playing .puzzlePanel{padding:12px 16px}
+ body.playing input[type=text]{padding:8px 12px}
+ body.playing .jar{font-size:1rem;padding:2px}
+}
+@media(min-width:900px){
+ body.playing .mechanism-2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 12px}
+ body.playing .mechanism-2>h3,body.playing .mechanism-2>p{grid-column:1/-1;margin:0}
+ body.playing .mechanism-2 fieldset{min-width:0;margin:0;font-size:.9rem}
+ body.playing .mechanism-2 fieldset button{font-size:.8rem;padding:8px}
+ body.playing .mechanism-3{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;align-items:center}
+ body.playing .mechanism-3>h3,body.playing .mechanism-3>p{grid-column:1/-1;margin:0}
+ body.playing .mechanism-3 label[for=robotModule]{grid-column:1;grid-row:3}
+ body.playing .mechanism-3 label[for=robotLight]{grid-column:2;grid-row:3}
+ body.playing #robotModule{grid-column:1;grid-row:4}
+ body.playing #robotLight{grid-column:2;grid-row:4}
+ body.playing .mechanism-3>button{grid-column:1;grid-row:5;justify-self:start;padding:7px 12px}
+ body.playing .mechanism-3>p[role=status]{grid-column:2;grid-row:5}
+ body.playing .scene-task{padding:12px 16px}
+}
+@media(min-width:900px) and (max-height:700px){
+ body.playing .wrap{padding:6px 16px}
+ body.playing .top{padding-bottom:5px}
+ body.playing .team-status{margin:5px 0;padding:4px 10px;font-size:.85rem}
+ body.playing .status{margin:5px 0}
+ body.playing .status .tag{font-size:.65rem}
+ body.playing #title{font-size:1.45rem}
+ body.playing .room-scene{height:210px;min-height:210px}
+ body.playing .room-scene .scene-object svg{height:70px}
+ body.playing .room-scene .scene-object small{display:none}
+ body.playing .room{padding:10px 12px}
+ body.playing .scene-task h3{font-size:1rem;margin:0}
+ body.playing .scene-task p{font-size:.8rem}
+ body.playing .poem-strips li{padding:3px 8px;font-size:.9rem}
+ body.playing .poem-strips .mini{padding:3px 8px;font-size:.8rem}
+ body.playing #snakeCanvas{width:min(100%,190px)}
+ body.playing #challenge:has(#snakeGame) .puzzlePanel>p{font-size:.8rem;line-height:1.4}
+ body.playing .snake-controls{grid-template-columns:repeat(3,38px)}
+ body.playing .snake-controls button{min-height:34px}
+ body.playing .footer{margin-top:5px}
+}
+@media(min-width:900px){
+ body.playing #challenge[data-room="3"] .lock-activity:first-child{display:grid;grid-template-columns:1fr 1.25fr;gap:8px 20px;align-items:start}
+ body.playing #challenge[data-room="3"] .lock-activity:first-child>.board{grid-column:1;grid-row:1/3;margin:0}
+ body.playing #challenge[data-room="3"] .lock-activity:first-child>p{grid-column:2}
+ body.playing #challenge[data-room="3"] .lock-activity:first-child>.options{grid-column:2;margin:0}
+ body.playing #challenge[data-room="3"] .rune{padding:8px;font-size:1rem}
+ body.playing #challenge[data-room="2"] .lock-activity:first-child{display:grid;grid-template-columns:1fr 1.2fr;gap:8px 20px;align-items:start}
+ body.playing #challenge[data-room="2"] .evidence{grid-column:1;grid-row:1}
+ body.playing #challenge[data-room="2"] .evidence+p{grid-column:1;grid-row:2}
+ body.playing #challenge[data-room="2"] .lock-activity:first-child>p:has(b){grid-column:2;grid-row:1}
+ body.playing #challenge[data-room="2"] .lock-activity:first-child>.options{grid-column:2;grid-row:2;margin:0}
+ body.playing #challenge[data-room="1"] .lock-activity:nth-child(2){display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;align-items:center}
+ body.playing #challenge[data-room="1"] .lock-activity:nth-child(2)>p:first-child{grid-column:1/-1}
+ body.playing #challenge[data-room="1"] .lock-activity:nth-child(2)>.board{grid-column:1;grid-row:2/4;margin:0}
+ body.playing #challenge[data-room="1"] .lock-activity:nth-child(2)>label,body.playing #value2b{grid-column:2}
+ body.playing #challenge[data-room="4"] .lock-activity:nth-child(2){display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;align-items:center}
+ body.playing #challenge[data-room="4"] .lock-activity:nth-child(2)>p:first-child{grid-column:1/-1}
+ body.playing #challenge[data-room="4"] .poem{grid-column:1;grid-row:2/5}
+ body.playing #challenge[data-room="4"] .lock-activity:nth-child(2)>label,body.playing #value5,body.playing #challenge[data-room="4"] .note{grid-column:2}
+}
+@media(min-width:900px){
+ body.playing .mechanism-4{display:grid;grid-template-columns:1fr 1.5fr;gap:8px 24px;align-items:start}
+ body.playing .mechanism-4>h3{grid-column:1;margin:0}
+ body.playing .mechanism-4>p{grid-column:1}
+ body.playing .mechanism-4>.poem-strips{grid-column:2;grid-row:1/4;margin:0}
+}
+@media(min-width:900px){
+ body.playing .mechanism-1{display:grid;grid-template-columns:1fr 1.4fr;gap:8px 20px;align-items:start}
+ body.playing .mechanism-1>h3,body.playing .mechanism-1>p,body.playing .mechanism-1>button{grid-column:1;margin:0;justify-self:start}
+ body.playing .mechanism-1>.mixing-bench{grid-column:2;grid-row:1/5;align-self:center;margin:0}
+}
+@media(min-width:900px) and (max-height:700px){
+ body.playing .puzzlePanel{font-size:.9rem}
+ body.playing .option{font-size:.85rem;padding:7px 10px}
+ body.playing #challenge[data-room="2"] .evidence{display:none}
+ body.playing #challenge[data-room="2"] .evidence+p{grid-row:1/3}
+}
+@media(min-width:900px) and (max-height:700px){
+ body.playing #roomNo{grid-row:1;align-self:center}
+ body.playing #title{grid-row:1;margin-left:100px}
+ body.playing .story-button{grid-row:1}
+}
+@media(min-width:900px) and (max-height:700px){
+ body.playing .wrap{padding-top:4px;padding-bottom:4px}
+ body.playing .team-status{padding-top:2px;padding-bottom:2px}
+ body.playing .clock{font-size:1.2rem}
+ body.playing .footer .mini{padding:4px 10px}
 }
