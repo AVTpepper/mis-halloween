@@ -411,3 +411,7 @@ body.playing .game-sidebar.viewing-clues .nav{display:none}
  body.playing .game-sidebar .footer p{display:none}
  body.playing .game-sidebar .progress{margin-top:4px}
 }
+/* Fit every edge of the illustration above the caption, without cropping or stretching. */
+.room-scene .scene-backdrop{height:calc(100% - 36px);bottom:auto}
+.clue-table{border:1px solid #806a91;border-radius:10px;padding:8px}
+.clue-table h4{margin:0 0 8px;color:var(--good);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
