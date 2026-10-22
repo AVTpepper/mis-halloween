@@ -12,3 +12,64 @@
 @media(max-width:600px){.room-scene{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:190px 190px;gap:18px 12px;height:auto;min-height:490px;padding:28px 12px 50px}.room-scene .scene-object,.room-scene .sealed-prop{position:relative;left:auto;top:auto;transform:none;align-self:start;justify-self:center;width:100%;max-width:135px;margin:0;padding:5px}.room-scene .scene-object:hover{transform:scale(1.03)}.room-scene .scene-object svg{height:95px}.room-scene .sealed-prop:hover{transform:none}.room-scene .scene-object[data-slot=left],.room-scene .sealed-prop[data-slot=left]{grid-column:1;grid-row:1}.room-scene .scene-object[data-slot=right],.room-scene .sealed-prop[data-slot=right]{grid-column:2;grid-row:1}.room-scene .scene-object[data-slot=center],.room-scene .sealed-prop[data-slot=center]{grid-column:1/-1;grid-row:2;max-width:160px}.room-scene .scene-object>span{font-size:.75rem}.room-scene .scene-object small{font-size:.62rem}.room-scene .sealed-prop{height:150px}.room-scene .scene-caption{padding:10px;min-height:35px}}
 .object-clue{margin:16px 0;padding:18px 20px;border:1px solid #b99b69;border-left:4px solid var(--accent);border-radius:12px;background:#2d223c;scroll-margin:20px}.object-clue h3{margin:8px 0}.object-clue p{color:var(--text);margin:6px 0;line-height:1.65}
 .mixing-bench .drop-orange{border-color:#ffa34d;box-shadow:inset 4px 0 #ffa34d}.mixing-bench .drop-purple{border-color:#c486db;box-shadow:inset 4px 0 #c486db}
+/* Keep the rescue workspace compact; supporting text expands on demand. */
+.room-brief summary,.search-help summary,.cluebook summary{cursor:pointer;color:var(--good);font-size:.85rem;font-weight:750;padding:6px 0}
+.lock-prompt{padding:20px;border:1px dashed #8d759d;border-radius:12px;align-self:start}
+body.playing .scene{display:none}
+body.playing .room{max-width:none;padding:16px}
+body.playing #title{font-size:1.65rem;margin:4px 0}
+body.playing .room-scene{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:1fr;gap:8px;height:220px;min-height:220px;margin:8px 0;padding:14px 8px 40px}
+body.playing .room-scene .scene-object,body.playing .room-scene .sealed-prop{position:relative;left:auto;top:auto;transform:none;align-self:center;justify-self:center;width:100%;max-width:155px;height:auto;margin:0;padding:4px;grid-row:1}
+body.playing .room-scene .scene-object[data-slot=left],body.playing .room-scene .sealed-prop[data-slot=left]{grid-column:1}
+body.playing .room-scene .scene-object[data-slot=center],body.playing .room-scene .sealed-prop[data-slot=center]{grid-column:2}
+body.playing .room-scene .scene-object[data-slot=right],body.playing .room-scene .sealed-prop[data-slot=right]{grid-column:3}
+body.playing .room-scene .scene-object:hover{transform:scale(1.03)}
+body.playing .room-scene .scene-object svg{height:85px}
+body.playing .room-scene .scene-object>span{font-size:.75rem}
+body.playing .room-scene .scene-object small{font-size:.6rem}
+body.playing .object-clue{margin:8px 0;padding:10px 12px}
+body.playing .object-clue h3{font-size:1rem;margin:3px 0}
+body.playing .object-clue p{font-size:.9rem;line-height:1.45}
+body.playing .scene-task{margin:8px 0;padding:12px}
+body.playing .scene-task p{margin:6px 0;font-size:.9rem}
+body.playing .puzzlePanel{margin:0;padding:14px}
+body.playing .clockface,body.playing .bottles{display:none}
+body.playing .feedback:empty{display:none}
+body.playing .feedback{min-height:0;margin:6px 0}
+@media(min-width:900px) and (min-height:560px){
+ body.playing .wrap{max-width:1440px;height:100vh;height:100dvh;display:flex;flex-direction:column;padding:10px 20px;gap:8px}
+ body.playing .top{padding-bottom:8px;flex-shrink:0}
+ body.playing .team-status{margin:0;padding:6px 12px;flex-shrink:0}
+ body.playing #main{flex:1;min-height:0}
+ body.playing #game{height:100%;display:flex;flex-direction:column;gap:8px}
+ body.playing .status{margin:0;flex-shrink:0}
+ body.playing .status>div{display:flex;align-items:center;gap:12px}
+ body.playing .clock{font-size:1.4rem}
+ body.playing .room{flex:1;min-height:0;width:100%;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr) auto auto auto;column-gap:20px}
+ body.playing #roomNo,body.playing #title,body.playing .room-brief{grid-column:1/-1}
+ body.playing .room-brief{margin-bottom:6px;max-height:100px;overflow:auto}
+ body.playing #exploration{grid-column:1;grid-row:4/8;overflow:auto;min-height:0;padding:0 6px 4px 0;scrollbar-gutter:stable}
+ body.playing #challenge,body.playing #lockPrompt{grid-column:2;grid-row:4;overflow:auto;min-height:0;margin:0;scrollbar-gutter:stable}
+ body.playing .room>.actions{grid-column:2;grid-row:5;margin-top:8px}
+ body.playing #feedback{grid-column:2;grid-row:6}
+ body.playing .room>.row{grid-column:2;grid-row:7;margin-top:6px;font-size:.85rem}
+ body.playing .footer{display:flex;justify-content:space-between;align-items:center;margin:0;flex-shrink:0}
+ body.playing .footer p{margin:0}
+}
+@media(max-width:600px){
+ body.playing .wrap{padding:8px 10px 24px}
+ body.playing .top{gap:6px;padding-bottom:8px}
+ body.playing .nav{display:flex;gap:5px}
+ body.playing .nav .mini{font-size:.72rem;padding:7px 8px}
+ body.playing .team-status{margin:8px 0;padding:8px;gap:6px}
+ body.playing .team-status>span:last-child{display:none}
+ body.playing .status{margin:10px 0}
+ body.playing .status .tag{font-size:.6rem}
+ body.playing .progress{gap:4px}
+ body.playing .progress span{width:20px}
+ body.playing .room{padding:12px}
+ body.playing .room-scene{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:150px 145px;height:350px;min-height:350px;padding:10px 6px 35px;gap:6px}
+ body.playing .room-scene .scene-object[data-slot=left],body.playing .room-scene .sealed-prop[data-slot=left]{grid-column:1;grid-row:1}
+ body.playing .room-scene .scene-object[data-slot=right],body.playing .room-scene .sealed-prop[data-slot=right]{grid-column:2;grid-row:1}
+ body.playing .room-scene .scene-object[data-slot=center],body.playing .room-scene .sealed-prop[data-slot=center]{grid-column:1/-1;grid-row:2}
+}

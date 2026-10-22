@@ -39,6 +39,7 @@ function restore() {
 }
 function show(section) {
   Snake.pause(); updateLives();
+  document.body.classList.toggle('playing',section==='game');
   if(section!=='teacher')lockTeacherRoom();
   ['home','game','final','win','vote','teacher'].forEach(x=>el(x).classList.toggle('hidden',x!==section));
   window.scrollTo({top:0,behavior:'instant'});
@@ -93,6 +94,7 @@ function render() {
 function renderObjects() {
   el('exploration').innerHTML=Exploration.render(index);
   const ready=Exploration.complete(index)&&objects[index].every((o,i)=>inspected.includes(i));
+  el('lockPrompt').classList.toggle('hidden',ready);
   el('challenge').classList.toggle('hidden',!ready); el('checkBtn').disabled=!ready;
   if(index===5 && ready) Snake.mount();
 }
