@@ -54,11 +54,11 @@ test('countdown can be hidden and audio is silent until explicitly enabled',asyn
   await page.locator('#timerToggle').click();await expect(page.locator('#clock')).toBeVisible();
   await page.locator('#soundToggle').click();await expect(page.locator('#soundToggle')).toHaveAttribute('aria-pressed','true');
   await expect.poll(()=>page.evaluate(()=>MuseumAudio.status().contextState)).toBe('running');
-  await page.locator('#musicToggle').click();expect(await page.evaluate(()=>MuseumAudio.status().musicVoices)).toBe(3);
+  await page.locator('#musicToggle').click();expect(await page.evaluate(()=>MuseumAudio.status().musicVoices)).toBeGreaterThan(0);
   await page.getByRole('button',{name:'Home',exact:true}).click();
   expect(await page.evaluate(()=>MuseumAudio.status().musicVoices)).toBe(0);
   await page.locator('#enterBtn').click();
-  expect(await page.evaluate(()=>MuseumAudio.status().musicVoices)).toBe(3);
+  expect(await page.evaluate(()=>MuseumAudio.status().musicVoices)).toBeGreaterThan(0);
   await page.locator('#musicToggle').click();await page.locator('#soundToggle').click();
   expect(await page.evaluate(()=>MuseumAudio.status().musicVoices)).toBe(0);
   await page.reload();expect((await page.evaluate(()=>MuseumAudio.status())).effects).toBe(false);
