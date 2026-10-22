@@ -31,7 +31,7 @@ function restore() {
     if (!s || !Number.isInteger(s.lives) || s.lives<1 || s.lives>TEAM_LIVES || !s.started || !Number.isInteger(s.index) || s.index < 0 || s.index > rooms.length || !Array.isArray(s.code) || s.code.join('') !== rooms.slice(0,s.index).map(r=>r.digit).join('') || s.code.length !== s.index || !Number.isFinite(s.remaining) || s.remaining < 0 || s.remaining > 1200) return;
     lives=s.lives; Snake.restore(s.arcade); Exploration.restore(s.exploration);
     index=s.index; code=s.code; remaining=s.remaining; selected=s.selected || {}; inspected=Array.isArray(s.inspected)?s.inspected:[]; answers=s.answers || {}; jars=Array.isArray(s.jars)?s.jars:[]; started=true; won=!!s.won && index===rooms.length;
-    running=!!s.running && !won; deadline=Number.isFinite(s.deadline)?s.deadline:Date.now()+remaining*1000;
+    running=!won && remaining>0; deadline=s.running&&Number.isFinite(s.deadline)?s.deadline:Date.now()+remaining*1000;
     if(running) remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));
     if(!remaining) running=false;
     el('enterBtn').textContent = won ? 'Visit your rescue →' : 'Continue your rescue →';
@@ -66,16 +66,7 @@ function tick() {
 function updateClock() {
   el('clock').textContent=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
   el('clock').classList.toggle('low',remaining<180);
-  el('pauseBtn').textContent=running?'Pause':'Resume';
-  el('pauseBtn').disabled=remaining===0;
   if(el('finalClock')) el('finalClock').textContent=el('clock').textContent;
-}
-function togglePause() {
-  if(!remaining) return;
-  if(running) tick();
-  if(!remaining)return;
-  Snake.pause();
-  running=!running; deadline=Date.now()+remaining*1000; updateClock(); save();
 }
 function render() {
   const r=rooms[index];
@@ -211,7 +202,6 @@ function lockTeacherRoom() {
   el('teacherCode').value='';el('teacherCode').removeAttribute('aria-invalid');el('teacherFeedback').textContent='';
 }
 function openTeacherRoom() {
-  if(started&&running)togglePause();
   lockTeacherRoom();show('teacher');el('teacherCode').focus();
 }
 function unlockTeacherRoom(event) {
@@ -222,7 +212,7 @@ function unlockTeacherRoom(event) {
   }
   el('teacherCode').removeAttribute('aria-invalid');el('teacherCode').value='';
   el('teacherGate').classList.add('hidden');
-  el('teacherInfo').innerHTML=`<div class="card"><h2>Plan the rescue</h2><p>Allow 5 minutes to introduce Pip, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for 2–3 minutes per curriculum room and reserve 4–5 minutes for the arcade and final code. Teams use one device; two teammates take the Snake turns.</p><p>The countdown pauses when you open this room. Return to the escape room and press Resume when ready. At zero time, teams may keep solving.</p><p><b>Five shared lives:</b> an incorrect puzzle submission, incorrect final code or Snake crash costs one life. Hints and inspecting objects are free. Losing the last life automatically resets all answers, digits, arcade progress and the timer, and restores five lives.</p><p>Progress is saved in the current browser when storage is available. Use Start a new team game between groups. Refresh restores progress but never starts the snake automatically.</p></div>
+  el('teacherInfo').innerHTML=`<div class="card"><h2>Plan the rescue</h2><p>Allow 5 minutes to introduce Pip, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for 2–3 minutes per curriculum room and reserve 4–5 minutes for the arcade and final code. Teams use one device; two teammates take the Snake turns.</p><p>Once a team starts, its countdown continues during cutscenes, navigation, teacher access, Snake pauses and time away from the site. Students cannot pause it. At zero time, teams may keep solving.</p><p><b>Five shared lives:</b> an incorrect puzzle submission, incorrect final code or Snake crash costs one life. Hints and inspecting objects are free. Losing the last life automatically resets all answers, digits, arcade progress and the timer, and restores five lives.</p><p>Progress is saved in the current browser when storage is available. Use Start a new team game between groups. Refresh restores progress but never starts the snake automatically.</p></div>
     <div class="teacher-stages">${rooms.map((room,i)=>`<article class="card"><div class="tag">Stage ${i+1} · digit ${room.digit}</div><h2>${room.scene} ${room.title}</h2><p><b>Learning focus:</b> ${teacherStages[i].goal}</p><p><b>Scene walkthrough:</b> ${Exploration.guide(i)}</p><p><b>Answer and reasoning:</b> ${teacherStages[i].answer}</p><p><b>Discuss with students:</b> ${teacherStages[i].discussion}</p><p><b>Available hint:</b> ${room.hint}</p></article>`).join('')}</div>
     <div class="card"><h2>The final painting</h2><p>Assemble the six digits in room order: <strong class="teacher-rescue-code">${rooms.map(room=>room.digit).join('')}</strong>. A wrong rescue code costs one life. A correct code releases Pip and starts the celebration.</p><h3>Costume awards setup</h3><p>Create a Google Form for funniest, scariest, most creative and best homemade costume; link its responses to Google Sheets. In game.js, set GOOGLE_FORM_URL to the published HTTPS responder link ending in /viewform. A forms.gle short link opens in a new tab. Use costume labels or nominee numbers and check school access settings on a student device.</p><h3>Curriculum and deployment notes</h3><p>The supplied curriculum links are PYP 6 maths, perception and responsibility, technology limitations, persuasion and poetry. The original six teaching resources were not included in this checkout, so their alignment has not been independently verified. The questions are original.</p><p>This static site works offline and on GitHub Pages. The README includes deployment, editing, voting and ZIP instructions. This code gate keeps teacher information out of the normal student view; it is not secure authentication, and source inspection can reveal answers.</p></div>
     <button class="secondary" onclick="openTeacherRoom()">Lock teacher room</button>`;

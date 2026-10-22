@@ -51,7 +51,6 @@ const Snake = (() => {
   function toggle() {
     if(loop){pause();message('Turn paused. Your snake is safe until you resume.');return;}
     if(complete())return;
-    if(!running&&remaining>0){message('Resume the team countdown above before starting your turn.');return;}
     document.getElementById('snakeCanvas').focus();
     document.getElementById('snakeToggle').textContent='Pause turn';
     message(`Player ${state.player+1} is playing. Arrows / WASD to steer; Space pauses.`);schedule();

@@ -1,5 +1,5 @@
 const Cutscene=(()=>{
-  let timer=null, resumeCountdown=false, returnFocus=null;
+  let timer=null, returnFocus=null;
   const stories=[
     ['The doors are closing…','Pip calls from inside a painting. Follow the chimes into the Clockmaker’s room before the museum seals itself.','🕰️'],
     ['The clocks fall silent','A hidden doorway slides open. Beyond it, orange and purple potions bubble beneath a cloud of pumpkin fog.','⚗️'],
@@ -15,8 +15,6 @@ const Cutscene=(()=>{
     const dialog=document.getElementById('cutscene');
     if(!dialog.open)return;
     dialog.close();
-    if(resumeCountdown&&remaining>0&&!won){running=true;deadline=Date.now()+remaining*1000;updateClock();save();}
-    resumeCountdown=false;
     if(returnFocus?.isConnected&&!returnFocus.closest('.hidden'))returnFocus.focus({preventScroll:true});
     else document.getElementById('main').focus({preventScroll:true});
   }
@@ -26,8 +24,6 @@ const Cutscene=(()=>{
     const dialog=document.getElementById('cutscene');
     const story=stories[stage];
     returnFocus=document.activeElement;
-    resumeCountdown=running;
-    if(running){tick();running=false;updateClock();save();}
     document.getElementById('cutsceneTitle').textContent=story[0];
     document.getElementById('cutsceneStory').textContent=story[1];
     document.getElementById('cutsceneSymbol').textContent=story[2];
