@@ -3,6 +3,7 @@ const {test,expect}=require('@playwright/test');
 test('teacher gate protects the normal view, keeps time running and relocks on exit',async({page})=>{
   await page.clock.install({time:new Date('2026-10-22T12:00:00Z')});await page.clock.pauseAt(new Date('2026-10-22T12:00:01Z'));await page.goto('/');await page.locator('#enterBtn').click();await skipCutscene(page);
   await page.clock.fastForward(5000);
+  if(await page.locator('#sidebarToggle').isVisible())await page.locator('#sidebarToggle').click();
   await page.getByRole('button',{name:'Teacher room',exact:true}).click();
   await expect(page.locator('#teacherGate')).toBeVisible();
   await expect(page.locator('#teacherInfo')).toBeEmpty();
@@ -23,6 +24,7 @@ test('teacher gate protects the normal view, keeps time running and relocks on e
   await expect(page.locator('#clock')).toHaveText('18:55');
   await expect(page.locator('#pauseBtn')).toHaveCount(0);
   await expect(page.locator('#teacherInfo')).toBeEmpty();
+  if(await page.locator('#sidebarToggle').isVisible())await page.locator('#sidebarToggle').click();
   await page.getByRole('button',{name:'Teacher room',exact:true}).click();
   await expect(page.locator('#teacherGate')).toBeVisible();
   await page.locator('#teacherCode').fill('halloween123');await page.locator('#teacherCode').press('Enter');
@@ -30,6 +32,7 @@ test('teacher gate protects the normal view, keeps time running and relocks on e
   await expect(page.locator('#teacherInfo')).toBeEmpty();
   await page.locator('#teacherCode').fill('halloween123');await page.locator('#teacherCode').press('Enter');
   await page.reload();
+  if(await page.locator('#sidebarToggle').isVisible())await page.locator('#sidebarToggle').click();
   await page.getByRole('button',{name:'Teacher room',exact:true}).click();
   await expect(page.locator('#teacherGate')).toBeVisible();
   await expect(page.locator('#teacherInfo')).toBeEmpty();

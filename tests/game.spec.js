@@ -106,14 +106,14 @@ test('last team life resets all earned progress and persists the fresh game',asy
 test('continuous timer, refresh, timeout, restart and mobile layout',async({page})=>{
   await page.setViewportSize({width:375,height:812});await page.clock.install({time:new Date('2026-10-22T12:00:00Z')});await page.clock.pauseAt(new Date('2026-10-22T12:00:01Z'));await page.goto('/');
   await page.locator('#enterBtn').click();await skipCutscene(page);await page.clock.fastForward(5000);await expect(page.locator('#clock')).toHaveText('19:55');
-  await expect(page.locator('#pauseBtn')).toHaveCount(0);await page.getByRole('button',{name:'Home',exact:true}).click();await page.clock.fastForward(60000);
+  await expect(page.locator('#pauseBtn')).toHaveCount(0);await page.locator('#sidebarToggle').click();await page.getByRole('button',{name:'Home',exact:true}).click();await page.clock.fastForward(60000);
   await page.reload();await page.clock.fastForward(60000);await page.locator('#enterBtn').click();await skipCutscene(page);await expect(page.locator('#clock')).toHaveText('17:55');
   await page.clock.fastForward(1200000);await expect(page.locator('#clock')).toHaveText('00:00');
   await expect(page.locator('#pauseBtn')).toHaveCount(0);
   await inspect(page);await page.locator('#activityNext').click();await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
   await expect(page.locator('#title')).toContainText('Potion');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'Start a new team game'}).click();await expect(page.locator('#title')).toContainText('Potion');
+  await page.locator('#sidebarToggle').click();page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'Start a new team game'}).click();await expect(page.locator('#title')).toContainText('Potion');
   page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'Start a new team game'}).click();await skipCutscene(page);await expect(page.locator('#clock')).toHaveText('20:00');
   await expect(page.locator('#title')).toContainText('Clockmaker');await expect(page.locator('#pauseBtn')).toHaveCount(0);
 });
