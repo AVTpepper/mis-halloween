@@ -1,5 +1,5 @@
 const Cutscene=(()=>{
-  let timer=null, returnFocus=null;
+  let returnFocus=null;
   const stories=[
     ['The doors are closing…','Pip calls from inside a painting. Follow the chimes into the Clockmaker’s room before the museum seals itself.','🕰️'],
     ['The clocks fall silent','A hidden doorway slides open. Beyond it, orange and purple potions bubble beneath a cloud of pumpkin fog.','⚗️'],
@@ -11,7 +11,6 @@ const Cutscene=(()=>{
     ['Pip is free!','The frame breaks its spell. Pip floats into the moonlight, the museum doors swing open, and your team’s rescue is complete.','👻']
   ];
   function finish(){
-    clearTimeout(timer);timer=null;
     const dialog=document.getElementById('cutscene');
     if(!dialog.open)return;
     dialog.close();
@@ -30,10 +29,9 @@ const Cutscene=(()=>{
     document.getElementById('cutsceneChapter').textContent=stage===0?'Your rescue begins':stage===7?'Mission complete':`Room ${stage} cleared · digit ${rooms[stage-1].digit} recovered`;
     dialog.dataset.stage=String(stage);
     dialog.showModal();
-    timer=setTimeout(finish,5000);
   }
   document.addEventListener('DOMContentLoaded',()=>{
-    document.getElementById('cutscene').addEventListener('cancel',e=>{e.preventDefault();finish();});
+    document.getElementById('cutscene').addEventListener('cancel',e=>{e.preventDefault();});
   });
   return {play,finish};
 })();
