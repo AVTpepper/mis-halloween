@@ -43,10 +43,9 @@ test('team explores every room, recovers progress, and rescues Pip',async({page}
   await page.locator('#snakeToggle').click();
   await page.getByRole('button',{name:'Steer up',exact:true}).click();await page.clock.runFor(320);
   expect(await page.evaluate(()=>Snake.snapshot().body[0])).toEqual({x:3,y:4});
-  await page.locator('#pauseBtn').click();
+  await page.locator('#snakeToggle').click();
   const paused=await page.evaluate(()=>Snake.snapshot());
   await page.clock.runFor(2000);expect(await page.evaluate(()=>Snake.snapshot())).toEqual(paused);
-  await page.locator('#pauseBtn').click();
   await page.setViewportSize({width:1280,height:960});
   await page.screenshot({path:'artifacts/arcade-desktop.png',fullPage:true});
   await playTurn(page);await expect(page.locator('#playerOne')).toContainText('10 / 10');
@@ -104,19 +103,19 @@ test('last team life resets all earned progress and persists the fresh game',asy
   await expect(page.locator('#title')).toContainText('Clockmaker');
   await expect(page.locator('#lives')).toHaveText('5 / 5 lives');
 });
-test('pause, refresh, timeout, restart and mobile layout',async({page})=>{
-  await page.setViewportSize({width:375,height:812});await page.clock.install();await page.goto('/');
+test('continuous timer, refresh, timeout, restart and mobile layout',async({page})=>{
+  await page.setViewportSize({width:375,height:812});await page.clock.install({time:new Date('2026-10-22T12:00:00Z')});await page.clock.pauseAt(new Date('2026-10-22T12:00:01Z'));await page.goto('/');
   await page.locator('#enterBtn').click();await skipCutscene(page);await page.clock.fastForward(5000);await expect(page.locator('#clock')).toHaveText('19:55');
-  await page.locator('#pauseBtn').click();await page.clock.fastForward(60000);await expect(page.locator('#clock')).toHaveText('19:55');
-  await page.reload();await page.locator('#enterBtn').click();await skipCutscene(page);await expect(page.locator('#pauseBtn')).toHaveText('Resume');
-  await page.locator('#pauseBtn').click();await page.clock.fastForward(1200000);await expect(page.locator('#clock')).toHaveText('00:00');
-  await expect(page.locator('#pauseBtn')).toBeDisabled();
+  await expect(page.locator('#pauseBtn')).toHaveCount(0);await page.getByRole('button',{name:'Home',exact:true}).click();await page.clock.fastForward(60000);
+  await page.reload();await page.clock.fastForward(60000);await page.locator('#enterBtn').click();await skipCutscene(page);await expect(page.locator('#clock')).toHaveText('17:55');
+  await page.clock.fastForward(1200000);await expect(page.locator('#clock')).toHaveText('00:00');
+  await expect(page.locator('#pauseBtn')).toHaveCount(0);
   await inspect(page);await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();await skipCutscene(page);
   await expect(page.locator('#title')).toContainText('Potion');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'Start a new team game'}).click();await expect(page.locator('#title')).toContainText('Potion');
   page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'Start a new team game'}).click();await skipCutscene(page);await expect(page.locator('#clock')).toHaveText('20:00');
-  await expect(page.locator('#title')).toContainText('Clockmaker');await expect(page.locator('#pauseBtn')).toHaveText('Pause');
+  await expect(page.locator('#title')).toContainText('Clockmaker');await expect(page.locator('#pauseBtn')).toHaveCount(0);
 });
 test('costume voting uses configured form and accessible empty state',async({page})=>{
   await page.goto('/');await page.getByRole('button',{name:'Costume awards',exact:true}).click();

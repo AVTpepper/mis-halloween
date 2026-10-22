@@ -1,7 +1,7 @@
 const {skipCutscene}=require('./cutscene-helper');
 const {test,expect}=require('@playwright/test');
-test('teacher gate protects the normal view, pauses play and relocks on exit',async({page})=>{
-  await page.clock.install();await page.goto('/');await page.locator('#enterBtn').click();await skipCutscene(page);
+test('teacher gate protects the normal view, keeps time running and relocks on exit',async({page})=>{
+  await page.clock.install({time:new Date('2026-10-22T12:00:00Z')});await page.clock.pauseAt(new Date('2026-10-22T12:00:01Z'));await page.goto('/');await page.locator('#enterBtn').click();await skipCutscene(page);
   await page.clock.fastForward(5000);
   await page.getByRole('button',{name:'Teacher room',exact:true}).click();
   await expect(page.locator('#teacherGate')).toBeVisible();
@@ -20,8 +20,8 @@ test('teacher gate protects the normal view, pauses play and relocks on exit',as
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.clock.fastForward(60000);
   await page.getByRole('button',{name:'Escape room',exact:true}).click();await skipCutscene(page);
-  await expect(page.locator('#clock')).toHaveText('19:55');
-  await expect(page.locator('#pauseBtn')).toHaveText('Resume');
+  await expect(page.locator('#clock')).toHaveText('18:55');
+  await expect(page.locator('#pauseBtn')).toHaveCount(0);
   await expect(page.locator('#teacherInfo')).toBeEmpty();
   await page.getByRole('button',{name:'Teacher room',exact:true}).click();
   await expect(page.locator('#teacherGate')).toBeVisible();
