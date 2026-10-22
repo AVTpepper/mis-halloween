@@ -2,7 +2,7 @@
 
 A static, Chromebook-friendly Halloween escape room. Teams investigate six rooms, collect six digits and rescue Pip from a painting. No accounts, database, build step or runtime dependencies are required. Open `index.html` or host the six website files on GitHub Pages.
 
-Skippable five-second cutscenes introduce the museum, connect each solved room to the next, reveal recovered digits, and celebrate Pip’s rescue. Animated doors, glowing relics, floating Pip, stars and mist set the scene. Press Continue or Escape to skip; the team countdown keeps running during every scene. Reduced-motion preferences disable movement. Refreshing or closing the tab does not pause the countdown; reopening calculates the time left from the saved deadline.
+Student-controlled cutscenes introduce the museum, connect each solved room to the next, reveal recovered digits, and celebrate Pip’s rescue. Animated doors, glowing relics, floating Pip, stars and mist set the scene. Each modal stays open until the student activates Continue; it does not close automatically or with Escape or a backdrop click. Keyboard users can activate the Continue button with Enter or Space; the team countdown keeps running during every scene. Reduced-motion preferences disable movement. Refreshing or closing the tab does not pause the countdown; reopening calculates the time left from the saved deadline.
 
 Clicking an illustrated object reveals its clue directly beneath the room scene. Discovered clues stay in the notebook and can be read again by clicking the object. There are no video players, media downloads or loading screens. The countdown continues while investigating; students cannot pause the team countdown. The illustrated room transitions are rendered locally with HTML/CSS/SVG.
 

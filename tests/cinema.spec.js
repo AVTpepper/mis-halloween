@@ -1,20 +1,23 @@
 const {skipCutscene}=require('./cutscene-helper');
 const {investigateRoom}=require('./exploration-helper');
 const {test,expect}=require('@playwright/test');
-test('cutscenes keep time running, skip with Escape, and advance automatically',async({page})=>{
+test('cutscenes stay open until Continue while the countdown keeps running',async({page})=>{
   await page.clock.install({time:new Date('2026-10-21T12:00:00Z')});await page.clock.pauseAt(new Date('2026-10-21T12:00:01Z'));await page.goto('/');
   await expect(page.getByRole('button',{name:'Teacher room',exact:true})).toBeVisible();
   await page.locator('#enterBtn').click();
   await expect(page.locator('#cutscene')).toBeVisible();
   await expect(page.locator('#cutsceneTitle')).toHaveText('The doors are closing…');
   await page.clock.runFor(4000);await expect(page.locator('#clock')).toHaveText('19:56');
-  await page.keyboard.press('Escape');await expect(page.locator('#cutscene')).not.toBeVisible();
+  await page.keyboard.press('Escape');await expect(page.locator('#cutscene')).toBeVisible();
+  await page.mouse.click(5,5);await expect(page.locator('#cutscene')).toBeVisible();
+  await skipCutscene(page);await expect(page.locator('#cutscene')).not.toBeVisible();
   await page.clock.runFor(1000);await expect(page.locator('#clock')).toHaveText('19:55');
   await investigateRoom(page);
   await page.locator('#value1').fill('36');await page.locator('#checkBtn').click();
   await expect(page.locator('#cutsceneChapter')).toHaveText('Room 1 cleared · digit 6 recovered');
-  await page.clock.runFor(5000);await expect(page.locator('#cutscene')).not.toBeVisible();
-  await expect(page.locator('#clock')).toHaveText('19:50');
+  await page.clock.runFor(30000);await expect(page.locator('#cutscene')).toBeVisible();
+  await expect(page.locator('#clock')).toHaveText('19:25');
+  await skipCutscene(page);await expect(page.locator('#cutscene')).not.toBeVisible();
   await expect(page.locator('#title')).toHaveText('The Potion of Proportions');
 });
 test('home actions have space and teacher access is prominent on desktop and mobile',async({page})=>{
