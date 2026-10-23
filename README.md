@@ -37,7 +37,7 @@ Progress, clue discoveries, answers and the timer are saved in this browser's lo
 
 ## Team lives and the Serpent Arcade
 
-Teams start with **five shared lives**. Every incorrect Check the lock submission, incorrect final rescue code, or Snake crash costs one life. Hints, clue inspection and pausing are free. The remaining lives appear above the game and persist across refreshes. At zero lives the rescue automatically starts over: all room digits, answers, Snake levels and the countdown reset. Starting the new attempt restores five lives.
+Teams start with **five shared lives**. Every incorrect Check the lock submission, incorrect final rescue code, or Snake crash costs one life. Hints, clue inspection and pausing are free. The remaining lives appear above the game and persist across refreshes. Each loss shows a clear notice with the lives left and a reminder that losing the last life means starting over. At zero lives a Game over dialog stops play and the countdown. Select **Start again** to reset all room digits, clues, answers, Snake levels and the countdown, with five new lives. Refresh keeps the Game over screen until the team restarts.
 
 Snake is the sixth challenge, preserving all five curriculum rooms. Two teammates take **sequential turns on the same device**. Player 1 must clear 10 levels, then Player 2 must clear 10. One gold spark clears one short level; the snake grows and gradually speeds up. Walls and the snake’s body are hazards. A crash costs a team life and resets the active player’s run to zero; an already completed Player 1 turn is retained until the whole team loses its last life. Both players must reach 10/10 before the lock button enables and digit 7 can be earned.
 

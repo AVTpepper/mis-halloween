@@ -75,6 +75,17 @@ body.playing .footer{display:flex;justify-content:space-between;align-items:cent
 body.playing .footer p{margin:0}
 #roomStory{max-width:650px;background:var(--panel);color:var(--text);border:1px solid #8d759d;border-radius:18px;padding:24px}
 #roomStory::backdrop{background:#100c1fcc}
+/* Make life losses clear and highlight Continue only when it is ready. */
+.life-notice{position:fixed;z-index:30;top:16px;left:50%;transform:translateX(-50%);width:min(480px,calc(100% - 32px));padding:16px 20px;border:2px solid var(--bad);border-radius:16px;background:#321b30;box-shadow:0 8px 40px #0009}
+.life-notice h2{font:850 1.2rem/1.3 system-ui;color:var(--bad);margin:0 0 8px}
+.life-notice p{font-size:.9rem;color:var(--text);margin:6px 0}
+.life-notice button{margin-top:8px}
+#gameOverDialog{width:min(520px,calc(100% - 32px));max-height:calc(100dvh - 32px);padding:28px;border:2px solid var(--bad);border-radius:20px;background:var(--panel);color:var(--text);box-shadow:0 0 50px #ff9ea533}
+#gameOverDialog::backdrop{background:#100c1fee}
+#gameOverTitle{color:var(--bad)}
+#gameOverDialog p{color:var(--text);line-height:1.6}
+:is(#activityNext,#breakContinue,#enterBtn,#cutscene .primary,.continue-ready):not(:disabled){border-color:#ffe5b5;background:#ffcb85;box-shadow:0 0 0 2px #ffce9444,0 0 18px #ffbb6d99,0 0 32px #ffbb6d55}
+:is(#activityNext,#breakContinue,#enterBtn,#cutscene .primary,.continue-ready):not(:disabled):is(:hover,:focus-visible){background:#ffdfac;box-shadow:0 0 0 3px #ffce9466,0 0 24px #ffbb6dcc,0 0 42px #ffbb6d88}
 /* The arcade board and its controls share a single activity screen. */
 body.playing #challenge:has(#snakeGame) .puzzlePanel{display:grid;grid-template-columns:minmax(200px,1fr) minmax(0,2fr);gap:8px 20px}
 body.playing #challenge:has(#snakeGame) h3{grid-column:1;margin:0}

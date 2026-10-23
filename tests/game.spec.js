@@ -92,10 +92,13 @@ test('last team life resets all earned progress and persists the fresh game',asy
   await expect(page.locator('#lives')).toHaveText('1 / 5 lives');
   await expect(page.locator('#codeSoFar')).toHaveText('6');
   await page.locator('#checkBtn').click();await skipCutscene(page);
+  await expect(page.getByRole('dialog',{name:'Game over',exact:true})).toBeVisible();
+  await expect(page.locator('#lives')).toHaveText('0 / 5 lives');
+  await expect(page.locator('#gameOverHelp')).toContainText('start over from Room 1');
+  await page.getByRole('button',{name:'Start again',exact:false}).click();
   await expect(page.locator('#title')).toContainText('Clockmaker');
   await expect(page.locator('#lives')).toHaveText('5 / 5 lives');
   await expect(page.locator('#codeSoFar')).toHaveText('None yet');
-  await expect(page.locator('#feedback')).toContainText('whole rescue has restarted');
   await expect(page.locator('#checkBtn')).toBeDisabled();
   expect(await page.evaluate(()=>Snake.snapshot().cleared)).toEqual([0,0]);
   expect(await page.evaluate(()=>Exploration.snapshot().every(s=>!s.done))).toBe(true);

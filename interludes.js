@@ -27,7 +27,7 @@ const Interludes=(()=>{
     stopBeam();
     const memory=state.pending===2,done=complete();
     document.getElementById('breakTitle').textContent=memory?'The lantern alcove':'The firefly corridor';
-    document.getElementById('breakInstructions').textContent=memory?'Turn over two lanterns at a time. Find all six matching pairs.':'Catch five fireflies in the wandering flashlight. Aim with your pointer, or focus the corridor and use arrows / WASD, then Enter or Space to catch a lit bug. Only fully lit bugs can be caught. With reduced motion, aim the light yourself.';
+    document.getElementById('breakInstructions').textContent=memory?'Select two cards to turn them over. If the pictures match, they stay face up. If they do not match, choose another card to try again. Find all six pairs to light up Continue.':'Catch five fireflies. Move your mouse or finger to aim the light, then select a bug fully inside it. With a keyboard, press Tab to reach the corridor. Aim with arrows / WASD; press Enter or Space to catch. The light wanders until you aim it. If reduced motion is on, aim it yourself.';
     document.getElementById('breakStatus').textContent=done?'Break complete! Continue your rescue.':memory?`${state.matched.length} / ${labels.length} pairs found · ${state.moves} turns`:`${state.caught} / 5 fireflies caught`;
     const host=document.getElementById('breakGame');
     if(memory){
