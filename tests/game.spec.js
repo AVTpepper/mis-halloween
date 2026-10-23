@@ -121,15 +121,17 @@ test('continuous timer, refresh, timeout, restart and mobile layout',async({page
   await expect(page.locator('#title')).toContainText('Clockmaker');await expect(page.locator('#pauseBtn')).toHaveCount(0);
 });
 test('costume voting uses configured form and accessible empty state',async({page})=>{
+  await page.route('https://docs.google.com/**',r=>r.fulfill({body:'Voting form'}));
   await page.goto('/');await page.getByRole('button',{name:'Costume awards',exact:true}).click();
-  await expect(page.locator('#formShell')).toContainText('teacher connects');
+  await expect(page.locator('#formShell iframe')).toHaveAttribute('src','https://docs.google.com/forms/d/e/1FAIpQLSc4OojxYbd5VzChovNeGCGnjMCrabJye-ya-9DLnqHuXAny9w/viewform?usp=dialog&embedded=true');
+  await expect(page.locator('#formShell a')).toHaveAttribute('href','https://docs.google.com/forms/d/e/1FAIpQLSc4OojxYbd5VzChovNeGCGnjMCrabJye-ya-9DLnqHuXAny9w/viewform?usp=dialog');
+  await expect(page.locator('#formShell a')).toHaveAttribute('target','_blank');
   await expect(page.locator('.teacher')).toHaveCount(0);
   await page.route('**/game.js*',async route=>{
-    const response=await route.fetch();const body=(await response.text()).replace("const GOOGLE_FORM_URL='';","const GOOGLE_FORM_URL='https://docs.google.com/forms/d/e/example/viewform';");
+    const response=await route.fetch();const body=(await response.text()).replace(/const GOOGLE_FORM_URL='[^']*';/,"const GOOGLE_FORM_URL='';");
     await route.fulfill({response,body});
   });
-  await page.route('https://docs.google.com/**',r=>r.fulfill({body:'Voting form'}));
   await page.reload();
-  await expect(page.locator('#formShell iframe')).toHaveAttribute('src',/embedded=true/);
-  await expect(page.locator('#formShell a')).toHaveAttribute('target','_blank');
+  await expect(page.locator('#formShell')).toContainText('teacher connects');
+  await expect(page.locator('#formShell iframe')).toHaveCount(0);
 });
