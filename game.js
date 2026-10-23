@@ -28,6 +28,16 @@ function toggleSidebar(open=!document.body.classList.contains('sidebar-open'),fo
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.body.classList.contains('sidebar-open'))toggleSidebar(false);});
 matchMedia('(min-width:900px)').addEventListener('change',()=>toggleSidebar(false,false));
 const SAVE_KEY = 'midnight-museum-v2';
+// A teacher test gets a copied session key in its own tab, never the team save.
+function readTeacherTest(){
+  try{
+    const token=new URL(location.href).searchParams.get('teacherTest');
+    if(!token)return null;
+    const test=JSON.parse(sessionStorage.getItem('museum-teacher-test-'+token));
+    return test&&Number.isInteger(test.room)&&test.room>=0&&test.room<rooms.length&&['search','lock'].includes(test.stage)?test:null;
+  }catch{return null;}
+}
+const teacherTest=readTeacherTest();
 const TEAM_LIVES = 5;
 let lives = TEAM_LIVES, gameOver=false, gameOverReason='';
 const objects = [
@@ -67,9 +77,11 @@ let roomFlow={room:0,stage:'search',part:0};
 let selected = {}, inspected = [], answers = {}, jars = [], started = false, won = false, deadline = 0;
 function val(id) { return (el(id)?.value || '').trim(); }
 function save() {
+  if(teacherTest)return;
   try { localStorage.setItem(SAVE_KEY, JSON.stringify({index,code,remaining,running,selected,inspected,answers,jars,started,won,deadline,lives,gameOver,gameOverReason,roomFlow,activeClue,clueHistory,interludes:Interludes.snapshot(),arcade:Snake.snapshot(),exploration:Exploration.snapshot()})); } catch {}
 }
 function restore() {
+  if(teacherTest)return;
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY));
     if (!s || !Number.isInteger(s.lives) || s.lives<0 || s.lives===0&&s.gameOver!==true || s.lives>TEAM_LIVES || !s.started || !Number.isInteger(s.index) || s.index < 0 || s.index > rooms.length || !Array.isArray(s.code) || s.code.join('') !== rooms.slice(0,s.index).map(r=>r.digit).join('') || s.code.length !== s.index || !Number.isFinite(s.remaining) || s.remaining < 0 || s.remaining > 1200) return;
@@ -101,6 +113,7 @@ function show(section) {
   renderNotebook();renderPreferences();
   window.scrollTo({top:0,behavior:'instant'});
   el('main').focus({preventScroll:true});
+  el('teacherTestBanner').classList.toggle('hidden',!teacherTest);
 }
 function resumeGame() {
   if(gameOver)return showGameOver();
@@ -338,6 +351,7 @@ const teacherStages=[
   {goal:'Plan routes, practise spatial reasoning and share responsibility through two arcade turns.',answer:'Player 1 must collect 10 gold sparks to clear 10 levels. Player 2 must then do the same. Only when both show 10/10 can the team check the lock and receive digit 7.',discussion:'Each spark grows and speeds up the snake. Use arrows, WASD or the on-screen controls. A wall or tail collision costs one team life and resets the active player to level zero; the completed teammate’s turn remains until all team lives are lost. Pause to discuss a safe route.'}
 ];
 function lockTeacherRoom() {
+  el('teacherTestFeedback').textContent='';
   el('teacherInfo').replaceChildren();
   el('teacherInfo').classList.add('hidden');
   el('teacherGate').classList.remove('hidden');
@@ -345,6 +359,26 @@ function lockTeacherRoom() {
 }
 function openTeacherRoom() {
   lockTeacherRoom();show('teacher');el('teacherCode').focus();
+}
+function launchTeacherTest(room,stage='search'){
+  if(!el('teacherGate').classList.contains('hidden')||!el('teacherInfo').checkVisibility()||!Number.isInteger(room)||room<0||room>=rooms.length||!['search','lock'].includes(stage))return;
+  const token=crypto.randomUUID(),key='museum-teacher-test-'+token;
+  try{
+    sessionStorage.setItem(key,JSON.stringify({room,stage}));
+    const url=new URL(location.href);url.searchParams.set('teacherTest',token);url.hash='';
+    const tab=window.open(url.href,'_blank');
+    el('teacherTestFeedback').textContent=tab?'Test opened in a new tab. Your team’s saved progress is unchanged.':'The test tab could not open. Allow pop-ups for this site, then try again.';
+  }catch{el('teacherTestFeedback').textContent='The test tab could not open. Allow session storage for this site, then try again.';}
+  finally{try{sessionStorage.removeItem(key);}catch{}}
+}
+function startTeacherTest(test){
+  startGame(false);
+  index=test.room;code=rooms.slice(0,index).map(room=>room.digit);
+  clueHistory=Array.from({length:rooms.length},(_,i)=>i<index?[0,1,2]:[]);
+  inspected=test.stage==='lock'?[0,1,2]:[];
+  if(test.stage==='lock')Exploration.restore(Exploration.snapshot().map((state,i)=>i===index?{...state,done:true,failed:true,passed:true}:state));
+  roomFlow={room:index,stage:test.stage,part:0};render();show('game');
+  el('activityTitle').focus({preventScroll:true});
 }
 function unlockTeacherRoom(event) {
   event.preventDefault();
@@ -354,8 +388,10 @@ function unlockTeacherRoom(event) {
   }
   el('teacherCode').removeAttribute('aria-invalid');el('teacherCode').value='';
   el('teacherGate').classList.add('hidden');
+  el('teacherTestFeedback').textContent='';
   el('teacherInfo').innerHTML=`<div class="card"><h2>Plan the rescue</h2><p>Allow 5 minutes to introduce Pip, 20 minutes to escape, 10 minutes for costume voting and 5 minutes to celebrate. Aim for 2–3 minutes per curriculum room and reserve 4–5 minutes for the arcade and final code. Teams use one device; two teammates take the Snake turns.</p><p>Once a team starts, its countdown continues during cutscenes, navigation, teacher access, Snake pauses and time away from the site. Students cannot pause it. At zero time, teams may keep solving.</p><p>Optional lantern matching follows the potion room, and a firefly-catching break follows the robot room. Both can be skipped and cost no lives. The Info tab can hide the countdown; it still runs, and reaching zero never ends the rescue. Sound and an original Halloween waltz are optional and start off. Related lock questions share one screen, and the Clues tab keeps discoveries from every visited room.</p><p><b>Five shared lives:</b> an incorrect puzzle submission, incorrect final code or Snake crash costs one life. Hints and inspecting objects are free. Losing the last life opens a Game over screen. Select Start again to reset all answers, clues, digits, arcade progress and the timer, with five new lives.</p><p>Progress is saved in the current browser when storage is available. Use Start a new team game between groups. Refresh restores progress but never starts the snake automatically.</p></div>
-    <div class="teacher-stages">${rooms.map((room,i)=>`<article class="card"><div class="tag">Stage ${i+1} · digit ${room.digit}</div><h2>${room.scene} ${room.title}</h2><p><b>Learning focus:</b> ${teacherStages[i].goal}</p><p><b>Scene walkthrough:</b> ${Exploration.guide(i)}</p><p><b>Answer and reasoning:</b> ${teacherStages[i].answer}</p><p><b>Discuss with students:</b> ${teacherStages[i].discussion}</p><p><b>Available hint:</b> ${room.hint}</p></article>`).join('')}</div>
+    <div class="card teacher-testing"><h2>Test any room</h2><p>Choose Test room to try the search, room task and lock. Choose Test lock to jump straight to the questions or Snake. Each test opens in a new tab with five lives and 20 minutes. Close the test tab when you finish. Your team’s saved progress stays unchanged.</p></div>
+    <div class="teacher-stages">${rooms.map((room,i)=>`<article class="card"><div class="tag">Stage ${i+1} · digit ${room.digit}</div><h2>${room.scene} ${room.title}</h2><div class="actions teacher-test-actions"><button class="primary" aria-label="Test room ${i+1}: ${room.title}" onclick="launchTeacherTest(${i})">Test room ${i+1} ↗</button><button aria-label="Test lock ${i+1}: ${room.title}" onclick="launchTeacherTest(${i},'lock')">Test lock ↗</button></div><p><b>Learning focus:</b> ${teacherStages[i].goal}</p><p><b>Scene walkthrough:</b> ${Exploration.guide(i)}</p><p><b>Answer and reasoning:</b> ${teacherStages[i].answer}</p><p><b>Discuss with students:</b> ${teacherStages[i].discussion}</p><p><b>Available hint:</b> ${room.hint}</p></article>`).join('')}</div>
     <div class="card"><h2>The final painting</h2><p>Assemble the six digits in room order: <strong class="teacher-rescue-code">${rooms.map(room=>room.digit).join('')}</strong>. A wrong rescue code costs one life. A correct code releases Pip and starts the celebration.</p><h3>Costume awards setup</h3><p>Create a Google Form for funniest, scariest, most creative and best homemade costume; link its responses to Google Sheets. In game.js, set GOOGLE_FORM_URL to the published HTTPS responder link ending in /viewform. A forms.gle short link opens in a new tab. Use costume labels or nominee numbers and check school access settings on a student device.</p><h3>Curriculum and deployment notes</h3><p>The supplied curriculum links are PYP 6 maths, perception and responsibility, technology limitations, persuasion and poetry. The original six teaching resources were not included in this checkout, so their alignment has not been independently verified. The questions are original.</p><p>This static site works offline and on GitHub Pages. The README includes deployment, editing, voting and ZIP instructions. This code gate keeps teacher information out of the normal student view; it is not secure authentication, and source inspection can reveal answers.</p></div>
     <button class="secondary" onclick="openTeacherRoom()">Lock teacher room</button>`;
   el('teacherInfo').classList.remove('hidden');el('teacherInfo').focus();
@@ -366,3 +402,4 @@ const GOOGLE_FORM_URL='https://docs.google.com/forms/d/e/1FAIpQLSc4OojxYbd5VzCho
 function mountForm(){if(!GOOGLE_FORM_URL)return;let url;try{url=new URL(GOOGLE_FORM_URL);if(url.protocol!=='https:'||!(url.hostname==='docs.google.com'||url.hostname==='forms.gle'))return}catch{return}const shell=el('formShell');shell.innerHTML='';if(url.hostname==='docs.google.com'&&url.pathname.includes('/forms/')&&url.pathname.includes('/viewform')){const iframe=document.createElement('iframe');iframe.title='PYP 6 costume awards Google Form';url.searchParams.set('embedded','true');iframe.src=url.toString();iframe.loading='lazy';shell.append(iframe)}else{let p=document.createElement('p');p.textContent='Use the button below to open costume voting.';shell.append(p)}let a=document.createElement('a');a.href=GOOGLE_FORM_URL;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open the voting form in a new tab ↗';a.style.color='#ffbb6d';shell.append(a)}document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing&&!e.repeat&&e.target?.id==='finalCode'&&e.target.checkVisibility()&&!document.querySelector('dialog[open]')){e.preventDefault();unlock()}});restore();mountForm();updateClock();renderPreferences();renderNotebook();if(started&&running)timer=setInterval(tick,1000);
 
 if(gameOver)showGameOver();
+if(teacherTest)startTeacherTest(teacherTest);

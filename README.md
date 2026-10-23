@@ -49,6 +49,8 @@ Press Enter in a typed lock-answer field to check the lock, just as with the Che
 
 Open **Teacher room** in the top navigation and enter `halloween123` to view classroom planning, the learning focus, explanation, answer, digit and discussion prompt for every stage, the final code and setup notes. Opening or unlocking the teacher room does not pause the countdown. Leaving the room or refreshing locks it again; the access code is not saved in browser storage. Incorrect teacher-code attempts do not cost team lives.
 
+Each room guide has **Test room** and **Test lock** buttons. Test room starts at the search; Test lock opens the questions directly (or the Snake board). Tests open in separate tabs with fresh lives and their own timer. They do not read or overwrite the team’s saved game. Refreshing a test tab starts that room test fresh. Close it to return to the teacher guide. Allow pop-ups and session storage for the site to use these controls.
+
 This is a convenience gate on a static site, not secure authentication: the code and answers remain discoverable in the downloaded source. Avoid displaying the unlocked room to students.
 
 The supplied starting website identifies PYP 6 slide decks and EDM Unit 2 topics as its basis. Those six source resources were not present in this checkout, so these connections describe the supplied material and have not been independently checked against those resources. Questions are original classroom puzzles.
